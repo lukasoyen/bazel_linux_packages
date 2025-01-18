@@ -16,7 +16,11 @@ bazel_dep(name = "rules_java", version = "8.3.2")
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(bazel_lib_toolchains, "zstd_toolchains")
+use_repo(bazel_lib_toolchains, "zstd_linux_amd64")
+use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
 use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
+use_repo(bazel_lib_toolchains, "bsd_tar_linux_amd64")
+use_repo(bazel_lib_toolchains, "bsd_tar_linux_arm64")
 use_repo(bazel_lib_toolchains, "yq_darwin_amd64")
 use_repo(bazel_lib_toolchains, "yq_darwin_arm64")
 use_repo(bazel_lib_toolchains, "yq_linux_amd64")
@@ -91,4 +95,21 @@ apt.install(
     manifest = "apt/tests/resolution/clang.yaml",
     nolock = True,
 )
-use_repo(apt, "arch_all_test", "arch_all_test_resolve", "bullseye", "bullseye_nolock", "clang", "noble", "resolution_test", "resolution_test_resolve")
+apt.sysroot(
+    name = "clang_toolchain",
+    arch = "amd64",
+    lock = "//examples/clang_toolchain:focal.lock.json",
+    manifest = "//examples/clang_toolchain:focal.yaml",
+)
+use_repo(
+    apt,
+    "arch_all_test",
+    "arch_all_test_resolve",
+    "bullseye",
+    "bullseye_nolock",
+    "clang",
+    "clang_toolchain",
+    "noble",
+    "resolution_test",
+    "resolution_test_resolve",
+)
