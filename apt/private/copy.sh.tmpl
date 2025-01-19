@@ -3,8 +3,6 @@
 set -o pipefail -o errexit -o nounset
 
 lock=$(realpath "$1")
-autofix=${{2:-}}
-
 cd "$BUILD_WORKING_DIRECTORY"
 
 echo

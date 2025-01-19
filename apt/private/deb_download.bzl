@@ -1,4 +1,4 @@
-"repository rule for resolving and generating lockfile"
+"repository rule for downloading and uncompressing debian archive files"
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//apt/private:deb_repository.bzl", "deb_repository")

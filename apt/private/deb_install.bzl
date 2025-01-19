@@ -1,4 +1,4 @@
-"repository rule for generating a dependency graph from a lockfile."
+"repository rule for extracting debian archives into a install dir"
 
 load("//apt/private:util.bzl", "util")
 

@@ -10,19 +10,14 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "aspect_bazel_lib", version = "2.11.0")
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
-use_repo(bazel_lib_toolchains, "zstd_toolchains")
 use_repo(bazel_lib_toolchains, "zstd_linux_amd64")
 use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
-use_repo(bazel_lib_toolchains, "bsd_tar_toolchains")
 use_repo(bazel_lib_toolchains, "bsd_tar_linux_amd64")
 use_repo(bazel_lib_toolchains, "bsd_tar_linux_arm64")
-use_repo(bazel_lib_toolchains, "yq_linux_amd64")
-use_repo(bazel_lib_toolchains, "yq_linux_arm64")
 
 # Dev dependencies
-bazel_dep(name = "bazel_features", version = "1.23.0", dev_dependency = True)
-bazel_dep(name = "gazelle", version = "0.34.0", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.5.0", dev_dependency = True)
+bazel_dep(name = "gazelle", version = "0.41.0", dev_dependency = True, repo_name = "bazel_gazelle")
+bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependency = True)
 
 apt = use_extension(
     "@rules_linux_toolchains//apt:extensions.bzl",
