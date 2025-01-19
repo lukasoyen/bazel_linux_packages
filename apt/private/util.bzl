@@ -31,9 +31,6 @@ def _warning(rctx, message):
         "\033[0;33mWARNING:\033[0m {}".format(message),
     ], quiet = False)
 
-def _info(rctx, message):
-    rctx.execute(["echo", message], quiet = False)
-
 def _get_repo_path(rctx, source, path):
     # If a value the user supplied in `sources` starts with a `@`
     # we assume this to be a visible repo name (made visible via
@@ -60,7 +57,6 @@ util = struct(
     set_dict = _set_dict,
     get_dict = _get_dict,
     warning = _warning,
-    info = _info,
     get_repo_path = _get_repo_path,
     get_host_tool = _get_host_tool,
 )
