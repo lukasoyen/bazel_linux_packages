@@ -1,2 +1,0 @@
-PRETTY_NAME=Distroless
-VERSION=Debian GNU/Linux

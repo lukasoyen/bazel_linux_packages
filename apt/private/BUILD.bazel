@@ -1,36 +1,16 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 exports_files([
-    "dpkg_statusd.sh",
-    "dpkg_status.sh",
     "copy.sh.tmpl",
-    "package.BUILD.tmpl",
 ])
 
 bzl_library(
-    name = "dpkg_status",
-    srcs = ["dpkg_status.bzl"],
-    visibility = ["//apt:__subpackages__"],
-    deps = ["//distroless/private:tar"],
-)
-
-bzl_library(
-    name = "dpkg_statusd",
-    srcs = ["dpkg_statusd.bzl"],
-    visibility = ["//apt:__subpackages__"],
-    deps = ["//distroless/private:tar"],
-)
-
-bzl_library(
-    name = "deb_translate_lock",
-    srcs = ["deb_translate_lock.bzl"],
+    name = "deb_create_sysroot",
+    srcs = ["deb_create_sysroot.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = [
         ":lockfile",
-        ":starlark_codegen_utils",
-        "@bazel_skylib//lib:new_sets",
-        "@bazel_tools//tools/build_defs/repo:cache.bzl",
-        "@bazel_tools//tools/build_defs/repo:http.bzl",
+        "@bazel_skylib//lib:paths",
         "@bazel_tools//tools/build_defs/repo:utils.bzl",
     ],
 )
@@ -79,13 +59,6 @@ bzl_library(
     srcs = ["version.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = ["@aspect_bazel_lib//lib:strings"],
-)
-
-bzl_library(
-    name = "deb_import",
-    srcs = ["deb_import.bzl"],
-    visibility = ["//apt:__subpackages__"],
-    deps = ["@bazel_tools//tools/build_defs/repo:http.bzl"],
 )
 
 bzl_library(
