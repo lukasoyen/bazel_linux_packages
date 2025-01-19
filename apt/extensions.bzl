@@ -1,7 +1,7 @@
 "apt extensions"
 
-load("//apt/private:create_sysroot.bzl", "create_sysroot")
 load("//apt/private:deb_download.bzl", "deb_download")
+load("//apt/private:deb_install.bzl", "deb_install")
 load("//apt/private:deb_repository.bzl", "deb_repository")
 
 def _hash_inputs(tag):
@@ -59,25 +59,25 @@ def _linux_toolchains_extension(module_ctx):
                 input_hash = input_hash,
             )
 
-        for sysroot in mod.tags.sysroot:
+        for install in mod.tags.install:
             architectures = (
-                [sysroot.architecture] if sysroot.architecture else _collect_architectures(arch_by_download, [sysroot.source])
+                [install.architecture] if install.architecture else _collect_architectures(arch_by_download, [install.source])
             )
             if len(architectures) > 1:
-                fail("Please set a `architecture` attribute for {}".format(sysroot.name))
+                fail("Please set a `architecture` attribute for {}".format(install.name))
 
-            create_sysroot(
-                name = sysroot.name,
-                install_name = sysroot.name,
+            deb_install(
+                name = install.name,
+                install_name = install.name,
                 architecture = architectures[0],
-                source = sysroot.source,
+                source = install.source,
             )
 
             if mod.is_root:
-                if module_ctx.is_dev_dependency(sysroot):
-                    root_direct_dev_deps.append(sysroot.name)
+                if module_ctx.is_dev_dependency(install):
+                    root_direct_dev_deps.append(install.name)
                 else:
-                    root_direct_deps.append(sysroot.name)
+                    root_direct_deps.append(install.name)
 
     return module_ctx.extension_metadata(
         root_module_direct_deps = root_direct_deps,
@@ -137,14 +137,14 @@ download = tag_class(
         ),
     },
 )
-sysroot = tag_class(
+install = tag_class(
     attrs = {
         "name": attr.string(
             doc = "Name of the generated repository",
             mandatory = True,
         ),
         "architecture": attr.string(
-            doc = "Architectures for which to create the sysroot (defaults to single value architecture from `source` if not given",
+            doc = "Architectures for which to create the install (defaults to single value architecture from `source` if not given",
         ),
         "source": attr.string(
             doc = "download() repositorie to unpack packages from",
@@ -158,6 +158,6 @@ apt = module_extension(
     tag_classes = {
         "source": source,
         "download": download,
-        "sysroot": sysroot,
+        "install": install,
     },
 )

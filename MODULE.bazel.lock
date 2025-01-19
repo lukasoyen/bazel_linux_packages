@@ -159,8 +159,8 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "TjU/iYNbdtgqAaQMuIEwrkkCidljC8qQMvtLTkAhb5w=",
-        "usagesDigest": "9faKmJN4Xt05huEumc5TNTgvcc9bkzmGJ9yCcPTDbf0=",
+        "bzlTransitiveDigest": "1miUIqJc8rtH3lO/Cpz3apf60gqHugX2PA5OPoI816c=",
+        "usagesDigest": "fj1TseomSBVc0185mgQF4ANzT+xmq+WBNkZ26IeztIo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -208,7 +208,7 @@
             }
           },
           "clang_toolchain": {
-            "repoRuleId": "@@//apt/private:create_sysroot.bzl%create_sysroot",
+            "repoRuleId": "@@//apt/private:deb_install.bzl%deb_install",
             "attributes": {
               "install_name": "clang_toolchain",
               "architecture": "amd64",

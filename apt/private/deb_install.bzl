@@ -23,7 +23,7 @@ def _extract_data_file(rctx, host_tar, path):
             result.stderr,
         ))
 
-def _create_sysroot_impl(rctx):
+def _deb_install_impl(rctx):
     host_tar = util.get_host_tool(rctx, "bsd_tar", "tar")
 
     index = json.decode(rctx.read(util.get_repo_path(rctx, rctx.attr.source, "index.json")))
@@ -43,8 +43,8 @@ def _create_sysroot_impl(rctx):
         target_name = rctx.attr.source,
     ))
 
-create_sysroot = repository_rule(
-    implementation = _create_sysroot_impl,
+deb_install = repository_rule(
+    implementation = _deb_install_impl,
     attrs = {
         "install_name": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
