@@ -27,14 +27,17 @@ def _create_sysroot_impl(rctx):
     host_tar = util.get_host_tool(rctx, "bsd_tar", "tar")
 
     index = json.decode(rctx.read(util.get_repo_path(rctx, rctx.attr.source, "index.json")))
-    if rctx.attr.architecture not in index:
-        fail(
-            "Misconfigured `sysroot()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
-        )
 
-    for package in index[rctx.attr.architecture]:
-        path = rctx.path(Label(package))
-        _extract_data_file(rctx, host_tar, path)
+    # otherwise assume we are in the initial lockfile generation
+    if index:
+        if rctx.attr.architecture not in index:
+            fail(
+                "Misconfigured `sysroot()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
+            )
+
+        for package in index[rctx.attr.architecture]:
+            path = rctx.path(Label(package))
+            _extract_data_file(rctx, host_tar, path)
 
     rctx.file("BUILD.bazel", _ROOT_BUILD_TMPL.format(
         target_name = rctx.attr.source,

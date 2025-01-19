@@ -7,8 +7,8 @@ load("//apt/private:lockfile.bzl", "lockfile")
 load("//apt/private:util.bzl", "util")
 load("//apt/private:version_constraint.bzl", "version_constraint")
 
-def _resolve(rctx, resolver, architectures, packages, include_transitive):
-    lockf = lockfile.empty(rctx)
+def _resolve(rctx, input_hash, resolver, architectures, packages, include_transitive):
+    lockf = lockfile.empty(rctx, input_hash)
     for arch in architectures:
         dep_constraint_set = {}
         for dep_constraint in packages:
@@ -40,7 +40,7 @@ def _resolve(rctx, resolver, architectures, packages, include_transitive):
                 lockf.add_package_dependency(package, dep, arch)
     return lockf
 
-_BUILD_TMPL = """
+_INDEX_BUILD_TMPL = """
 filegroup(
     name = "lockfile",
     srcs = ["lock.json"],
@@ -53,6 +53,53 @@ sh_binary(
     data = ["lock.json"],
     tags = ["manual"],
     args = ["$(location :lock.json)"],
+    visibility = ["//visibility:public"]
+)
+"""
+
+def _deb_index_impl(rctx):
+    workspace_relative_path = "{}{}".format(
+        "{}/".format(rctx.attr.lockfile.package) if rctx.attr.lockfile.package else "",
+        rctx.attr.lockfile.name,
+    )
+
+    rctx.file(
+        "copy.sh",
+        rctx.read(rctx.attr._copy_sh_tmpl).format(
+            repo_name = rctx.attr.install_name.removesuffix("_index"),
+            lock_label = rctx.attr.lockfile or workspace_relative_path,
+            workspace_relative_path = workspace_relative_path,
+        ),
+        executable = True,
+    )
+
+    if rctx.path(rctx.attr.lockfile).exists:
+        rctx.file("lock.json", rctx.read(rctx.attr.lockfile))
+    else:
+        indices = [util.get_repo_path(rctx, s, "index.json") for s in rctx.attr.sources]
+        repository = deb_repository.new(rctx, indices)
+        resolver = dependency_resolver.new(repository)
+
+        lockf = _resolve(
+            rctx,
+            rctx.attr.input_hash,
+            resolver,
+            rctx.attr.architectures,
+            rctx.attr.packages,
+            rctx.attr.resolve_transitive,
+        )
+        lockf.write("lock.json")
+
+    rctx.file(
+        "BUILD.bazel",
+        _INDEX_BUILD_TMPL,
+        executable = False,
+    )
+
+_BUILD_TMPL = """
+alias(
+    name="lock",
+    actual="@@{}_index//:lock",
     visibility = ["//visibility:public"]
 )
 """
@@ -88,86 +135,90 @@ def _decompress_data_file(rctx, host_zstd, path):
         ))
     return path
 
-def _deb_download_impl(rctx):
+def _extract_packages(rctx, lockf):
     host_zstd = util.get_host_tool(rctx, "zstd", "zstd")
-
-    workspace_relative_path = "{}{}".format(
-        "{}/".format(rctx.attr.lockfile.package) if rctx.attr.lockfile.package else "",
-        rctx.attr.lockfile.name,
-    )
-
-    rctx.file(
-        "copy.sh",
-        rctx.read(rctx.attr._copy_sh_tmpl).format(
-            repo_name = rctx.attr.install_name,
-            lock_label = rctx.attr.lockfile,
-            workspace_relative_path = workspace_relative_path,
-        ),
-        executable = True,
-    )
-
     data_files = dict()
 
-    if rctx.attr.lockfile == None or not rctx.path(rctx.attr.lockfile).exists:
-        indices = [util.get_repo_path(rctx, s, "index.json") for s in rctx.attr.sources]
-        repository = deb_repository.new(rctx, indices)
-        resolver = dependency_resolver.new(repository)
-
-        lockf = _resolve(
-            rctx,
-            resolver,
-            rctx.attr.architectures,
-            rctx.attr.packages,
-            rctx.attr.resolve_transitive,
+    package_folder = "packages"
+    for (package) in lockf.packages():
+        package_key = lockfile.make_package_key(
+            package["name"],
+            package["version"],
+            package["arch"],
         )
-        util.info(
+        rctx.download_and_extract(
+            package["url"],
+            sha256 = package["sha256"],
+            output = "{}/{}".format(package_folder, package_key),
+        )
+
+        path = _find_data_file(rctx, package_folder, package_key)
+        if not path.endswith(".tar"):
+            path = _decompress_data_file(rctx, host_zstd, path)
+
+        arch = package["arch"]
+        if arch not in data_files:
+            data_files[arch] = []
+
+        data_files[arch].append("@@{}//:{}".format(rctx.name, path))
+    return data_files
+
+def _deb_download_impl(rctx):
+    data_files = []
+
+    # Ensure the repository gets restarted once the lockfile exists.
+    rctx.watch(rctx.attr.lockfile)
+
+    if not rctx.path(rctx.attr.lockfile).exists:
+        util.warning(
             rctx,
-            "Lockfile created. Please run:\nbazel run @{}//:lock".format(rctx.attr.install_name),
+            "Lockfile needs to be created. Please run:\nbazel run @{}//:lock".format(rctx.attr.install_name),
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
-
-        package_folder = "packages"
-        for (package) in lockf.packages():
-            package_key = lockfile.make_package_key(
-                package["name"],
-                package["version"],
-                package["arch"],
+        if lockf.input_hash() != rctx.attr.input_hash:
+            util.warning(
+                rctx,
+                "Lockfile needs to be recreated. Please run:\nbazel run @{}//:lock".format(rctx.attr.install_name),
             )
-            rctx.download_and_extract(
-                package["url"],
-                sha256 = package["sha256"],
-                output = "{}/{}".format(package_folder, package_key),
-            )
+        data_files = _extract_packages(rctx, lockf)
 
-            path = _find_data_file(rctx, package_folder, package_key)
-            if not path.endswith(".tar"):
-                path = _decompress_data_file(rctx, host_zstd, path)
+    rctx.file(
+        "index.json",
+        json.encode_indent(data_files),
+        executable = False,
+    )
+    rctx.file(
+        "BUILD.bazel",
+        _BUILD_TMPL.format(rctx.attr.name),
+        executable = False,
+    )
 
-            arch = package["arch"]
-            if arch not in data_files:
-                data_files[arch] = []
-
-            data_files[arch].append("@@{}//:{}".format(rctx.name, path))
-
-    print("TODO: detect changes")
-    lockf.write("lock.json")
-
-    rctx.file("index.json", json.encode_indent(data_files))
-    rctx.file("BUILD.bazel", _BUILD_TMPL)
-
-deb_download = repository_rule(
-    implementation = _deb_download_impl,
+_deb_index = repository_rule(
+    implementation = _deb_index_impl,
     attrs = {
         "install_name": attr.string(mandatory = True),
         "sources": attr.string_list(mandatory = True),
         "architectures": attr.string_list(mandatory = True),
         "packages": attr.string_list(mandatory = True),
-        "lockfile": attr.label(),
+        "lockfile": attr.label(mandatory = True),
         "resolve_transitive": attr.bool(default = True),
+        "input_hash": attr.string(mandatory = True),
         "_copy_sh_tmpl": attr.label(
             default = "//apt/private:copy.sh.tmpl",
             doc = "INTERNAL, DO NOT USE",
         ),
     },
+)
+_deb_download = repository_rule(
+    implementation = _deb_download_impl,
+    attrs = {
+        "lockfile": attr.label(mandatory = True),
+        "input_hash": attr.string(mandatory = True),
+    },
+)
+
+deb_download = struct(
+    index = _deb_index,
+    download = _deb_download,
 )

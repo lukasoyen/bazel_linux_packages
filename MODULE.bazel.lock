@@ -142,7 +142,7 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "zbt7H2cgHefVnN0J83pMdBI6rYa7+6uFgpK512m3T6A=",
+        "bzlTransitiveDigest": "TjU/iYNbdtgqAaQMuIEwrkkCidljC8qQMvtLTkAhb5w=",
         "usagesDigest": "9faKmJN4Xt05huEumc5TNTgvcc9bkzmGJ9yCcPTDbf0=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -164,10 +164,10 @@
               "uri": "https://snapshot.ubuntu.com/ubuntu/20250219T120000Z"
             }
           },
-          "download": {
-            "repoRuleId": "@@//apt/private:deb_download.bzl%deb_download",
+          "download_index": {
+            "repoRuleId": "@@//apt/private:deb_download.bzl%_deb_index",
             "attributes": {
-              "install_name": "download",
+              "install_name": "download_index",
               "sources": [
                 "source"
               ],
@@ -179,7 +179,15 @@
                 "gcc-10"
               ],
               "lockfile": "@@//examples/clang_toolchain:focal.lock.json",
-              "resolve_transitive": true
+              "resolve_transitive": true,
+              "input_hash": "inputs-1754577153"
+            }
+          },
+          "download": {
+            "repoRuleId": "@@//apt/private:deb_download.bzl%_deb_download",
+            "attributes": {
+              "lockfile": "@@//examples/clang_toolchain:focal.lock.json",
+              "input_hash": "inputs-1754577153"
             }
           },
           "clang_toolchain": {
