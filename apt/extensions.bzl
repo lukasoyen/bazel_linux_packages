@@ -73,6 +73,7 @@ def _linux_toolchains_extension(module_ctx):
                 apparent_name = install.name,
                 architecture = architectures[0],
                 source = install.source,
+                build_file = install.build_file,
             )
 
             if mod.is_root:
@@ -151,6 +152,10 @@ install = tag_class(
         "source": attr.string(
             doc = "download() repositorie to unpack packages from",
             default = "download",
+        ),
+        "build_file": attr.label(
+            doc = "Experimental: BUILD.bazel template for the generated install dir.",
+            default = "//apt:install.BUILD.bazel.tmpl",
         ),
     },
 )

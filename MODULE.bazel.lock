@@ -163,7 +163,7 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "syNOsney/Jh5pdSEWMSb1FsrjYz1gtdYnyZETxjdmvk=",
+        "bzlTransitiveDigest": "TQMD209hbbq6/vhgZ6zzQaPR1qyostiLJfQVFTFEjZI=",
         "usagesDigest": "cEyGDMq77ksrb9u1cxJUKqmbHxZuvTNGpG9RnHKJAyg=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -220,7 +220,8 @@
             "attributes": {
               "apparent_name": "clang_toolchain",
               "architecture": "amd64",
-              "source": "download"
+              "source": "download",
+              "build_file": "@@//apt:install.BUILD.bazel.tmpl"
             }
           }
         },
