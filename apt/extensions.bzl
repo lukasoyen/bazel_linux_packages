@@ -21,7 +21,7 @@ def _resolve_lockfile(module_ctx, tag):
         lockf = lockfile.from_json(module_ctx, module_ctx.read(tag.lock))
     return lockf
 
-def _distroless_extension(module_ctx):
+def _linux_toolchains_extension(module_ctx):
     root_direct_deps = []
     root_direct_dev_deps = []
 
@@ -84,7 +84,7 @@ sysroot = tag_class(
 )
 
 apt = module_extension(
-    implementation = _distroless_extension,
+    implementation = _linux_toolchains_extension,
     tag_classes = {
         "sysroot": sysroot,
     },

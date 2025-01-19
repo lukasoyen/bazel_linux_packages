@@ -141,8 +141,8 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "GPgLxNDoW06GLDUrbkl6ktquBMWxuNxpJ8X3ha2sho4=",
-        "usagesDigest": "+Bwwtxkrtcb9UydZlCRY9t36QVCpt31shyYe51AbIKs=",
+        "bzlTransitiveDigest": "kioAdDVtDNswztzUwdhIGdfrx5sxPv1nROo8xdgAkLI=",
+        "usagesDigest": "HUx5x+DyFTsN1Qv6cbKICyaznRjghFBsOut8LSEkOtY=",
         "recordedFileInputs": {
           "@@//examples/clang_toolchain/focal.lock.json": "ab98182c0ab81f0ce8bd8b0f8f27974c8febf119783274acaa9c15428db00fe6"
         },
@@ -190,7 +190,7 @@
     "@@aspect_bazel_lib+//lib:extensions.bzl%toolchains": {
       "general": {
         "bzlTransitiveDigest": "B/yM1bxXtnLWs4ADjepewz3pFO6EnC4otr3UukxqlVk=",
-        "usagesDigest": "VfW/SlfFcs8GN3gcz+8LHP9hoLDsGUTFIrJKUfm2SGM=",
+        "usagesDigest": "riKVB6yHEtfw2V9lRejD+JqGjpdBHdnOosUq2VYibpA=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

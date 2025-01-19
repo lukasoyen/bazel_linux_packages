@@ -104,7 +104,7 @@ sh_binary(
     tags = ["manual"],
     args = ["$(location :lock.json)"],
     visibility = ["//visibility:public"]
-) 
+)
 """
 
 def _deb_resolve_impl(rctx):
@@ -123,7 +123,7 @@ def _deb_resolve_impl(rctx):
         rctx.read(rctx.attr._copy_sh_tmpl).format(
             # NOTE: the split("~") is needed when we run bazel from another
             # directory, e.g. when running e2e tests we change dir to e2e/smoke
-            # and then rctx.name is 'rules_distroless~~apt~bullseye'
+            # and then rctx.name is 'rules_linux_toolchains~~apt~bullseye'
             repo_name = rctx.attr.install_name,
             lock_label = lock_label,
             workspace_relative_path = workspace_relative_path,

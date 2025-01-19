@@ -36,6 +36,7 @@ def _resolve_package(state, name, version, arch):
 
         # Otherwise, we can't disambiguate the virtual package providers so
         # choose none and warn.
+        # buildifier: disable=print
         print("Multiple candidates for virtual package '{}': {}".format(
             name,
             [package["Package"] for package in candidates],
@@ -56,7 +57,7 @@ def _resolve_package(state, name, version, arch):
                 selected_version = av
 
                 # Since versions are ordered by hight to low, the first satisfied version will be
-                # the highest version and rules_distroless ignores Priority field so it's safe.
+                # the highest version and rules_linux_toolchains ignores Priority field so it's safe.
                 # TODO: rethink this `break` with https://github.com/GoogleContainerTools/rules_distroless/issues/34
                 break
     elif len(versions) > 0:
