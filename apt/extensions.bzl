@@ -1,45 +1,61 @@
 "apt extensions"
 
-load("//apt/private:deb_create_sysroot.bzl", "deb_create_sysroot")
-load("//apt/private:deb_resolve.bzl", "deb_resolve", "internal_resolve")
-load("//apt/private:lockfile.bzl", "lockfile")
+load("//apt/private:create_sysroot.bzl", "create_sysroot")
+load("//apt/private:deb_download.bzl", "deb_download")
+load("//apt/private:deb_repository.bzl", "deb_repository")
 
-def _resolve_lockfile(module_ctx, tag):
-    lockf = None
-    if not tag.lock:
-        lockf = internal_resolve(
-            module_ctx,
-            "yq",
-            tag.manifest,
-            tag.resolve_transitive,
-        )
-
-        if not tag.nolock:
-            # buildifier: disable=print
-            print("\nNo lockfile was given, please run `bazel run @%s//:lock` to create the lockfile." % tag.name)
-    else:
-        lockf = lockfile.from_json(module_ctx, module_ctx.read(tag.lock))
-    return lockf
+def _collect_architectures(mapping, repos):
+    result = list()
+    for repo in repos:
+        result.extend(mapping.get(repo, ()))
+    return result
 
 def _linux_toolchains_extension(module_ctx):
     root_direct_deps = []
     root_direct_dev_deps = []
 
-    for mod in module_ctx.modules:
-        for sysroot in mod.tags.sysroot:
-            lockf = _resolve_lockfile(module_ctx, sysroot)
+    arch_by_source = dict()
+    arch_by_download = dict()
 
-            deb_resolve(
-                name = sysroot.name + "_resolve",
-                manifest = sysroot.manifest,
-                resolve_transitive = sysroot.resolve_transitive,
+    for mod in module_ctx.modules:
+        for source in mod.tags.source:
+            arch_by_source[source.name] = list(source.architectures)
+
+            deb_repository.fetch(
+                name = source.name,
+                suites = source.suites,
+                architectures = source.architectures,
+                components = source.components,
+                uri = source.uri,
+            )
+        for download in mod.tags.download:
+            architectures = (
+                download.architectures if download.architectures else _collect_architectures(arch_by_source, download.sources)
+            )
+            arch_by_download[download.name] = architectures
+
+            deb_download(
+                name = download.name,
+                install_name = download.name,
+                sources = download.sources,
+                architectures = architectures,
+                packages = download.packages,
+                lockfile = download.lockfile,
+                resolve_transitive = download.resolve_transitive,
             )
 
-            deb_create_sysroot(
+        for sysroot in mod.tags.sysroot:
+            architectures = (
+                [sysroot.architecture] if sysroot.architecture else _collect_architectures(arch_by_download, [sysroot.source])
+            )
+            if len(architectures) > 1:
+                fail("Please set a `architecture` attribute for {}".format(sysroot.name))
+
+            create_sysroot(
                 name = sysroot.name,
-                arch = sysroot.arch,
-                lock = sysroot.lock,
-                lock_content = lockf.as_json(),
+                install_name = sysroot.name,
+                architecture = architectures[0],
+                source = sysroot.source,
             )
 
             if mod.is_root:
@@ -53,27 +69,50 @@ def _linux_toolchains_extension(module_ctx):
         root_module_direct_dev_deps = root_direct_dev_deps,
     )
 
-sysroot = tag_class(
+source = tag_class(
     attrs = {
         "name": attr.string(
             doc = "Name of the generated repository",
+            default = "source",
+        ),
+        "suites": attr.string_list(
+            doc = "Deb suites to download the packages from (see DEB822)",
             mandatory = True,
         ),
-        "arch": attr.string(
-            doc = "Architecture for which to genererate the sysroot repository",
+        "architectures": attr.string_list(
+            doc = "Architectures for which to download the package lists (see DEB822)",
             mandatory = True,
         ),
-        "manifest": attr.label(
-            doc = "The file used to generate the lock file",
+        "components": attr.string_list(
+            doc = "Deb components to download the packages from (see DEB822)",
             mandatory = True,
         ),
-        "lock": attr.label(
+        "uri": attr.string(
+            doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
+            mandatory = True,
+        ),
+    },
+)
+
+download = tag_class(
+    attrs = {
+        "name": attr.string(
+            doc = "Name of the generated repository",
+            default = "download",
+        ),
+        "sources": attr.string_list(
+            doc = "source() repositories to download packages from",
+            default = ["source"],
+        ),
+        "architectures": attr.string_list(
+            doc = "Architectures for which to download packages (defaults to architectures from `sources` if not given",
+        ),
+        "packages": attr.string_list(
+            doc = "Packages to download",
+            mandatory = True,
+        ),
+        "lockfile": attr.label(
             doc = "The lock file to use for the index.",
-        ),
-        "nolock": attr.bool(
-            doc = "If you explicitly want to run without a lock, set it " +
-                  "to `True` to avoid the DEBUG messages.",
-            default = False,
         ),
         "resolve_transitive": attr.bool(
             doc = "Whether dependencies of dependencies should be " +
@@ -82,10 +121,27 @@ sysroot = tag_class(
         ),
     },
 )
+sysroot = tag_class(
+    attrs = {
+        "name": attr.string(
+            doc = "Name of the generated repository",
+            mandatory = True,
+        ),
+        "architecture": attr.string(
+            doc = "Architectures for which to create the sysroot (defaults to single value architecture from `source` if not given",
+        ),
+        "source": attr.string(
+            doc = "download() repositorie to unpack packages from",
+            default = "download",
+        ),
+    },
+)
 
 apt = module_extension(
     implementation = _linux_toolchains_extension,
     tag_classes = {
+        "source": source,
+        "download": download,
         "sysroot": sysroot,
     },
 )

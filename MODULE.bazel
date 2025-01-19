@@ -27,11 +27,24 @@ apt = use_extension(
     "apt",
     dev_dependency = True,
 )
+apt.source(
+    architectures = ["amd64"],
+    components = [
+        "main",
+        "universe",
+    ],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T120000Z",
+)
+apt.download(
+    lockfile = "//examples/clang_toolchain:focal.lock.json",
+    packages = [
+        "clang-10",
+        "gcc-10",
+    ],
+)
 apt.sysroot(
     name = "clang_toolchain",
-    arch = "amd64",
-    lock = "//examples/clang_toolchain:focal.lock.json",
-    manifest = "//examples/clang_toolchain:focal.yaml",
 )
 use_repo(
     apt,

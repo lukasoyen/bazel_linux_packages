@@ -50,7 +50,7 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
             attempt_messages.append("""\n*) Failed '{}'\n\n{}""".format(url, reason))
 
         fail("""
-** Tried to download {} different package indices and all failed. 
+** Tried to download {} different package indices and all failed.
 
 {}
         """.format(len(failed_attempts), "\n".join(attempt_messages)))
@@ -141,27 +141,18 @@ def _package_versions(state, name, arch):
 def _package(state, name, version, arch):
     return util.get_dict(state.packages, keys = (arch, name, version))
 
-def _create(rctx, sources, archs):
+def _create(mctx, indices):
     state = struct(
         packages = dict(),
         virtual_packages = dict(),
     )
 
-    for arch in archs:
-        for (url, dist, comp) in sources:
-            # We assume that `url` does not contain a trailing forward slash when passing to
-            # functions below. If one is present, remove it. Some HTTP servers do not handle
-            # redirects properly when a path contains "//"
-            # (ie. https://mymirror.com/ubuntu//dists/noble/stable/... may return a 404
-            # on misconfigured HTTP servers)
-            url = url.rstrip("/")
-
-            rctx.report_progress("Fetching package index: {}/{} for {}".format(dist, comp, arch))
-            (output, _) = _fetch_package_index(rctx, url, dist, comp, arch, "")
-
+    for idx in indices:
+        index = json.decode(mctx.read(mctx.path(idx)))
+        for (package_lst, uri) in index.items():
             # TODO: this is expensive to perform.
-            rctx.report_progress("Parsing package index: {}/{} for {}".format(dist, comp, arch))
-            _parse_repository(state, rctx.read(output), url)
+            mctx.report_progress("Parsing package index {}".format(package_lst))
+            _parse_repository(state, mctx.read(Label(package_lst)), uri)
 
     return struct(
         package_versions = lambda **kwargs: _package_versions(state, **kwargs),
@@ -169,7 +160,44 @@ def _create(rctx, sources, archs):
         package = lambda **kwargs: _package(state, **kwargs),
     )
 
+def _fetch_impl(rctx):
+    package_files = dict()
+    for dist in rctx.attr.suites:
+        for arch in rctx.attr.architectures:
+            for comp in rctx.attr.components:
+                # We assume that `url` does not contain a trailing forward slash when passing to
+                # functions below. If one is present, remove it. Some HTTP servers do not handle
+                # redirects properly when a path contains "//"
+                # (ie. https://mymirror.com/ubuntu//dists/noble/stable/... may return a 404
+                # on misconfigured HTTP servers)
+                uri = rctx.attr.uri.rstrip("/")
+
+                rctx.report_progress("Fetching package index: {}/{} for {}".format(dist, comp, arch))
+                (output, _) = _fetch_package_index(rctx, uri, dist, comp, arch, "")
+                package_files["@@{}//:{}".format(rctx.name, output)] = uri
+
+    rctx.file(
+        "index.json",
+        json.encode_indent(package_files),
+        executable = False,
+    )
+    rctx.file(
+        "BUILD.bazel",
+        executable = False,
+    )
+
+_fetch = repository_rule(
+    implementation = _fetch_impl,
+    attrs = {
+        "suites": attr.string_list(mandatory = True),
+        "architectures": attr.string_list(mandatory = True),
+        "components": attr.string_list(mandatory = True),
+        "uri": attr.string(mandatory = True),
+    },
+)
+
 deb_repository = struct(
+    fetch = _fetch,
     new = _create,
 )
 

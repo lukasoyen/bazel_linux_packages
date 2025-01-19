@@ -11,21 +11,9 @@ echo
 echo "Writing lockfile to {workspace_relative_path}"
 cp "$lock" "{workspace_relative_path}"
 
-# Detect which file we wish the user to edit
-if [ -e "$BUILD_WORKSPACE_DIRECTORY/WORKSPACE" ]; then
-     wksp_file="WORKSPACE"
-elif [ -e "$BUILD_WORKSPACE_DIRECTORY/WORKSPACE.bazel" ]; then
-     wksp_file="WORKSPACE.bazel"
-elif [ -e "$BUILD_WORKSPACE_DIRECTORY/MODULE.bazel" ]; then
-    wksp_file="MODULE.bazel"
-else
-    echo>&2 "Error: no MODULE.bazel or WORKSPACE file was found"
-    exit 1
-fi
-
 # Detect a vendored buildozer binary in canonical location (tools/buildozer)
 if [ -e "$BUILD_WORKSPACE_DIRECTORY/tools/buildozer" ]; then
-    buildozer="tools/buildozer"
+    buildozer="./tools/buildozer"
 else
     # Assume it's on the $PATH
     buildozer="buildozer"
@@ -33,19 +21,9 @@ fi
 
 echo
 
-cmd="$buildozer 'set lock \"{lock_label}\"' $wksp_file:{repo_name}"
-
-if [[ "$autofix" == "--autofix" ]]; then
-    eval "$cmd"
-else
-    cat <<EOF
+cat <<EOF
 Run the following command to add the 'lock' attribute
-to the "{repo_name}" repo in $wksp_file:
+to the "@{repo_name}" repo in MODULE.bazel:
 
-    $cmd
-
-or run the following command to do it automatically:
-
-    bazel run @{repo_name}//:lock -- --autofix
+$buildozer 'set lock "{lock_label}"' MODULE.bazel:{repo_name}
 EOF
-fi
