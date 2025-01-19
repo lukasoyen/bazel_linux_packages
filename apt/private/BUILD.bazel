@@ -6,7 +6,6 @@ exports_files([
 
 bzl_library(
     name = "deb_create_sysroot",
-    srcs = ["deb_create_sysroot.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = [
         ":lockfile",
@@ -24,7 +23,6 @@ bzl_library(
 
 bzl_library(
     name = "apt_deb_repository",
-    srcs = ["apt_deb_repository.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = [
         ":util",
@@ -34,7 +32,6 @@ bzl_library(
 
 bzl_library(
     name = "apt_dep_resolver",
-    srcs = ["apt_dep_resolver.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = [
         ":version",
@@ -44,7 +41,6 @@ bzl_library(
 
 bzl_library(
     name = "deb_resolve",
-    srcs = ["deb_resolve.bzl"],
     visibility = ["//apt:__subpackages__"],
     deps = [
         ":apt_deb_repository",
@@ -69,13 +65,49 @@ bzl_library(
 )
 
 bzl_library(
-    name = "starlark_codegen_utils",
-    srcs = ["starlark_codegen_utils.bzl"],
+    name = "create_sysroot",
+    srcs = ["create_sysroot.bzl"],
     visibility = ["//apt:__subpackages__"],
+    deps = [":util"],
+)
+
+bzl_library(
+    name = "deb_download",
+    srcs = ["deb_download.bzl"],
+    visibility = ["//apt:__subpackages__"],
+    deps = [
+        ":deb_repository",
+        ":deb_resolver",
+        ":lockfile",
+        ":util",
+        ":version_constraint",
+        "@bazel_skylib//lib:paths",
+    ],
+)
+
+bzl_library(
+    name = "deb_repository",
+    srcs = ["deb_repository.bzl"],
+    visibility = ["//apt:__subpackages__"],
+    deps = [
+        ":util",
+        ":version_constraint",
+    ],
+)
+
+bzl_library(
+    name = "deb_resolver",
+    srcs = ["deb_resolver.bzl"],
+    visibility = ["//apt:__subpackages__"],
+    deps = [
+        ":version",
+        ":version_constraint",
+    ],
 )
 
 bzl_library(
     name = "util",
     srcs = ["util.bzl"],
     visibility = ["//apt:__subpackages__"],
+    deps = ["@aspect_bazel_lib//lib:repo_utils"],
 )

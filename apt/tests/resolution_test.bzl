@@ -1,8 +1,8 @@
 "unit tests for resolution of package dependencies"
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//apt/private:apt_deb_repository.bzl", deb_repository = "DO_NOT_DEPEND_ON_THIS_TEST_ONLY")
-load("//apt/private:apt_dep_resolver.bzl", "dependency_resolver")
+load("//apt/private:deb_repository.bzl", deb_repository = "DO_NOT_DEPEND_ON_THIS_TEST_ONLY")
+load("//apt/private:deb_resolver.bzl", "dependency_resolver")
 load("//apt/private:version_constraint.bzl", "version_constraint")
 
 def _parse_depends_test(ctx):
