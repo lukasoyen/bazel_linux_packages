@@ -66,7 +66,7 @@ def _deb_index_impl(rctx):
     rctx.file(
         "copy.sh",
         rctx.read(rctx.attr._copy_sh_tmpl).format(
-            repo_name = rctx.attr.install_name.removesuffix("_index"),
+            repo_name = rctx.attr.apparent_name.removesuffix("_index"),
             lock_label = rctx.attr.lockfile or workspace_relative_path,
             workspace_relative_path = workspace_relative_path,
         ),
@@ -169,17 +169,26 @@ def _deb_download_impl(rctx):
     # Ensure the repository gets restarted once the lockfile exists.
     rctx.watch(rctx.attr.lockfile)
 
+    lock_targets = (
+        ["@{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.attr.apparent_name)]
+    )
     if not rctx.path(rctx.attr.lockfile).exists:
         util.warning(
             rctx,
-            "Lockfile needs to be created. Please run:\nbazel run @{}//:lock".format(rctx.attr.install_name),
+            (
+                "Lockfiles need to be created. Please run:" +
+                "\nbazel run {}".format(" ".join(lock_targets))
+            ),
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
         if lockf.input_hash() != rctx.attr.input_hash:
             util.warning(
                 rctx,
-                "Lockfile needs to be recreated. Please run:\nbazel run @{}//:lock".format(rctx.attr.install_name),
+                (
+                    "Lockfiles need to be recreated. Please run:" +
+                    "\nbazel run {}".format(" ".join(lock_targets))
+                ),
             )
         data_files = _extract_packages(rctx, lockf)
 
@@ -197,7 +206,7 @@ def _deb_download_impl(rctx):
 _deb_index = repository_rule(
     implementation = _deb_index_impl,
     attrs = {
-        "install_name": attr.string(mandatory = True),
+        "apparent_name": attr.string(mandatory = True),
         "sources": attr.string_list(mandatory = True),
         "architectures": attr.string_list(mandatory = True),
         "packages": attr.string_list(mandatory = True),
@@ -213,8 +222,10 @@ _deb_index = repository_rule(
 _deb_download = repository_rule(
     implementation = _deb_download_impl,
     attrs = {
+        "apparent_name": attr.string(mandatory = True),
         "lockfile": attr.label(mandatory = True),
         "input_hash": attr.string(mandatory = True),
+        "install_names": attr.string_list(mandatory = True),
     },
 )
 

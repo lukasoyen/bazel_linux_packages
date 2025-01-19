@@ -46,7 +46,7 @@ def _deb_install_impl(rctx):
 deb_install = repository_rule(
     implementation = _deb_install_impl,
     attrs = {
-        "install_name": attr.string(mandatory = True),
+        "apparent_name": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
         "source": attr.string(mandatory = True),
     },

@@ -163,8 +163,8 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "4uwFkUgBZQqt0TLJb/Hr2LwmgHIAjmqaa2LNWMLmeHI=",
-        "usagesDigest": "fj1TseomSBVc0185mgQF4ANzT+xmq+WBNkZ26IeztIo=",
+        "bzlTransitiveDigest": "syNOsney/Jh5pdSEWMSb1FsrjYz1gtdYnyZETxjdmvk=",
+        "usagesDigest": "cEyGDMq77ksrb9u1cxJUKqmbHxZuvTNGpG9RnHKJAyg=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -182,13 +182,13 @@
                 "main",
                 "universe"
               ],
-              "uri": "https://snapshot.ubuntu.com/ubuntu/20250219T120000Z"
+              "uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
             }
           },
           "download_index": {
             "repoRuleId": "@@//apt/private:deb_download.bzl%_deb_index",
             "attributes": {
-              "install_name": "download_index",
+              "apparent_name": "download_index",
               "sources": [
                 "source"
               ],
@@ -201,20 +201,24 @@
               ],
               "lockfile": "@@//examples/clang_toolchain:focal.lock.json",
               "resolve_transitive": true,
-              "input_hash": "inputs-1754577153"
+              "input_hash": "inputs--544892906"
             }
           },
           "download": {
             "repoRuleId": "@@//apt/private:deb_download.bzl%_deb_download",
             "attributes": {
+              "apparent_name": "download",
               "lockfile": "@@//examples/clang_toolchain:focal.lock.json",
-              "input_hash": "inputs-1754577153"
+              "input_hash": "inputs--544892906",
+              "install_names": [
+                "clang_toolchain"
+              ]
             }
           },
           "clang_toolchain": {
             "repoRuleId": "@@//apt/private:deb_install.bzl%deb_install",
             "attributes": {
-              "install_name": "clang_toolchain",
+              "apparent_name": "clang_toolchain",
               "architecture": "amd64",
               "source": "download"
             }

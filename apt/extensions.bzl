@@ -45,7 +45,7 @@ def _linux_toolchains_extension(module_ctx):
 
             deb_download.index(
                 name = download.name + "_index",
-                install_name = download.name + "_index",
+                apparent_name = download.name + "_index",
                 sources = download.sources,
                 architectures = architectures,
                 packages = download.packages,
@@ -55,8 +55,10 @@ def _linux_toolchains_extension(module_ctx):
             )
             deb_download.download(
                 name = download.name,
+                apparent_name = download.name,
                 lockfile = download.lockfile,
                 input_hash = input_hash,
+                install_names = [install.name for install in mod.tags.install],
             )
 
         for install in mod.tags.install:
@@ -68,7 +70,7 @@ def _linux_toolchains_extension(module_ctx):
 
             deb_install(
                 name = install.name,
-                install_name = install.name,
+                apparent_name = install.name,
                 architecture = architectures[0],
                 source = install.source,
             )

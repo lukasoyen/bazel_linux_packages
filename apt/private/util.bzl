@@ -42,7 +42,7 @@ def _get_repo_path(rctx, source, path):
         # the correct prefix to append to.
 
     else:
-        repo = "@@" + rctx.attr.name.replace(rctx.attr.install_name, source)
+        repo = "@@" + rctx.attr.name.replace(rctx.attr.apparent_name, source)
     return Label("{}//:{}".format(repo, path))
 
 def _get_host_tool(rctx, repo, name):

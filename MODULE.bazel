@@ -31,7 +31,7 @@ apt.source(
         "universe",
     ],
     suites = ["focal"],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T120000Z",
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
 )
 apt.download(
     lockfile = "//examples/clang_toolchain:focal.lock.json",
