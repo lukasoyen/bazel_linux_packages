@@ -163,7 +163,7 @@
   "moduleExtensions": {
     "//apt:extensions.bzl%apt": {
       "general": {
-        "bzlTransitiveDigest": "TQMD209hbbq6/vhgZ6zzQaPR1qyostiLJfQVFTFEjZI=",
+        "bzlTransitiveDigest": "oeXmmznpz90lQJaOZs/EhJiGLc4lTSP+/10JFlIt24o=",
         "usagesDigest": "cEyGDMq77ksrb9u1cxJUKqmbHxZuvTNGpG9RnHKJAyg=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
