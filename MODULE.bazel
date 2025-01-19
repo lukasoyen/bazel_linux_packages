@@ -40,10 +40,5 @@ apt.download(
         "gcc-10",
     ],
 )
-apt.install(
-    name = "clang_toolchain",
-)
-use_repo(
-    apt,
-    "clang_toolchain",
-)
+apt.install(name = "clang_toolchain")
+use_repo(apt, "clang_toolchain")
