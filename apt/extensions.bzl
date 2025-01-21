@@ -13,7 +13,9 @@ def _hash_inputs(tag):
 def _collect_architectures(mapping, repos):
     result = list()
     for repo in repos:
-        result.extend(mapping.get(repo, ()))
+        if repo not in mapping:
+            fail("Source {} not found. Available: {}".format(repo, ", ".join(mapping.keys())))
+        result.extend(mapping[repo])
     return result
 
 def _linux_toolchains_extension(module_ctx):
