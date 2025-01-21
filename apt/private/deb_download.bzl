@@ -73,22 +73,19 @@ def _deb_index_impl(rctx):
         executable = True,
     )
 
-    if rctx.path(rctx.attr.lockfile).exists:
-        rctx.file("lock.json", rctx.read(rctx.attr.lockfile))
-    else:
-        indices = [util.get_repo_path(rctx, s, "index.json") for s in rctx.attr.sources]
-        repository = deb_repository.new(rctx, indices)
-        resolver = dependency_resolver.new(repository)
+    indices = [util.get_repo_path(rctx, s, "index.json") for s in rctx.attr.sources]
+    repository = deb_repository.new(rctx, indices)
+    resolver = dependency_resolver.new(repository)
 
-        lockf = _resolve(
-            rctx,
-            rctx.attr.input_hash,
-            resolver,
-            rctx.attr.architectures,
-            rctx.attr.packages,
-            rctx.attr.resolve_transitive,
-        )
-        lockf.write("lock.json")
+    lockf = _resolve(
+        rctx,
+        rctx.attr.input_hash,
+        resolver,
+        rctx.attr.architectures,
+        rctx.attr.packages,
+        rctx.attr.resolve_transitive,
+    )
+    lockf.write("lock.json")
 
     rctx.file(
         "BUILD.bazel",
@@ -169,28 +166,23 @@ def _deb_download_impl(rctx):
     # Ensure the repository gets restarted once the lockfile exists.
     rctx.watch(rctx.attr.lockfile)
 
-    lock_targets = (
-        ["@{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.attr.apparent_name)]
+    lock_cmds = (
+        ["bazel run @{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.attr.apparent_name)]
     )
     if not rctx.path(rctx.attr.lockfile).exists:
         util.warning(
             rctx,
-            (
-                "Lockfiles need to be created. Please run:" +
-                "\nbazel run {}".format(" ".join(lock_targets))
-            ),
+            "\n".join(["Lockfiles need to be created. Please run:"] + lock_cmds),
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
         if lockf.input_hash() != rctx.attr.input_hash:
             util.warning(
                 rctx,
-                (
-                    "Lockfiles need to be recreated. Please run:" +
-                    "\nbazel run {}".format(" ".join(lock_targets))
-                ),
+                "\n".join(["Lockfiles need to be recreated. Please run:"] + lock_cmds),
             )
-        data_files = _extract_packages(rctx, lockf)
+        else:
+            data_files = _extract_packages(rctx, lockf)
 
     rctx.file(
         "index.json",

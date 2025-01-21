@@ -16,14 +16,16 @@ filegroup(
     name = "files",
     srcs = glob(
         ["**"],
-        exclude = ["BUILD.bazel", "REPO.bazel"],
+        exclude = ["BUILD.bazel", "REPO.bazel", "usr/share/man/**"],
+        allow_empty = True, # during lockfile generation
     ),
 )
 
 exports_files(
     srcs = glob(
         ["**"],
-        exclude = ["BUILD.bazel", "REPO.bazel"],
+        exclude = ["BUILD.bazel", "REPO.bazel", "usr/share/man/**"],
+        allow_empty = True, # during lockfile generation
     ),
 )
 

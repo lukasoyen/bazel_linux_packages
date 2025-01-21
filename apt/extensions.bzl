@@ -7,7 +7,7 @@ load("//apt/private:deb_repository.bzl", "deb_repository")
 def _hash_inputs(tag):
     values = dict()
     for attr in dir(tag):
-        values[attr] = getattr(tag, attr)
+        values[attr] = str(getattr(tag, attr))
     return "inputs-{}".format(hash(json.encode(values)))
 
 def _collect_architectures(mapping, repos):
@@ -37,11 +37,15 @@ def _linux_toolchains_extension(module_ctx):
                 uri = source.uri,
             )
         for download in mod.tags.download:
-            input_hash = "inputs-{}".format(hash("-".join([hash_by_source[s] for s in download.sources])))
             architectures = (
                 download.architectures if download.architectures else _collect_architectures(arch_by_source, download.sources)
             )
             arch_by_download[download.name] = architectures
+
+            input_hash = "inputs-{}-{}".format(
+                hash("-".join([hash_by_source[s] for s in download.sources])),
+                _hash_inputs(download),
+            )
 
             deb_download.index(
                 name = download.name + "_index",
