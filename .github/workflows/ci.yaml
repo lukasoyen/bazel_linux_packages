@@ -21,10 +21,13 @@ jobs:
         [
           ".",
           "e2e/smoke"
+          "e2e/llvm_toolchain"
         ]
       exclude: |
         [
-          {"folder": ".", "bzlmodEnabled": false}
+          {"bzlmodEnabled": false},
+          {"os": "windows-latest"},
+          {"os": "macos-latest"}
         ]
   pre-commit:
     runs-on: ubuntu-latest
