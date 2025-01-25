@@ -9,8 +9,8 @@ bzl_library(
     srcs = ["extensions.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//apt/private:deb_create_sysroot",
-        "//apt/private:deb_resolve",
-        "//apt/private:lockfile",
+        "//apt/private:deb_download",
+        "//apt/private:deb_install",
+        "//apt/private:deb_repository",
     ],
 )
