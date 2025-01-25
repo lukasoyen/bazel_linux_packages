@@ -1,18 +1,48 @@
-# Bazel rules for debian_packages
+# Bazel extension for downloading and extracting debian packages
 
-## Installation
+This `bazel` extension enables downloading and extracting `*.deb` into a `bazel`
+repository. This can be used to run binaries packaged as `*.deb` packages or
+create compiler toolchains and sysroots.
 
-From the release you wish to use:
-<https://github.com/lukasoyen/debian_packages/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
+> [!IMPORTANT]
+> This is not a ruleset to create `*.deb` packages.
 
-To use a commit rather than a release, you can point at any SHA of the repo.
+## Usage
 
-For example to use commit `abc123`:
+Put the following in your `MODULE.bazel`. During the first setup a `*.lock.json`
+file will not exist. Run `bazel run @busybox//:lock` to create the lockfile.
+After that, `bazel run @busybox//:bin/busybox` should run the downloaded binary.
+See [e2e/smoke/MODULE.bazel](e2e/smoke/MODULE.bazel) for an end to end test.
 
-1. Replace `url = "https://github.com/lukasoyen/debian_packages/releases/download/v0.1.0/debian_packages-v0.1.0.tar.gz"` with a GitHub-provided source archive like `url = "https://github.com/lukasoyen/debian_packages/archive/abc123.tar.gz"`
-1. Replace `strip_prefix = "debian_packages-0.1.0"` with `strip_prefix = "debian_packages-abc123"`
-1. Update the `sha256`. The easiest way to do this is to comment out the line, then Bazel will
-   print a message with the correct value. Note that GitHub source archives don't have a strong
-   guarantee on the sha256 stability, see
-   <https://github.blog/2023-02-21-update-on-the-future-stability-of-source-code-archives-and-hashes/>
+```
+apt = use_extension("@debian_packages//apt:extensions.bzl", "apt", dev_dependency = True)
+apt.source(
+    architectures = ["amd64"],
+    components = [
+        "main",
+        "universe",
+    ],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.download(
+    lockfile = "//:focal.lock.json",
+    packages = ["busybox"],
+)
+apt.install(name = "busybox")
+use_repo(apt, "busybox")
+```
+
+## Related
+
+- [debian_dependency_bazelizer](https://github.com/shabanzd/debian_dependency_bazelizer)
+  does something in the same area, but differently
+- [bazel-cc-sysroot-generator](https://github.com/keith/bazel-cc-sysroot-generator)
+  creates a sysroot archive outside of `bazel`
+
+## Credit
+
+- https://github.com/keith/bazel-cc-sysroot-generator inspired the idea
+- https://github.com/GoogleContainerTools/rules_distroless was forked and reworked
+  - ideas from https://github.com/GoogleContainerTools/rules_distroless/issues/123 were used
+  - https://github.com/GoogleContainerTools/rules_distroless/issues/124 is the same idea
