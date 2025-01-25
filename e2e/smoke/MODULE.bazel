@@ -1,7 +1,28 @@
-bazel_dep(name = "debian_packages", version = "0.0.0", dev_dependency = True)
-bazel_dep(name = "bazel_skylib", version = "1.7.1", dev_dependency = True)
+bazel_dep(name = "debian_packages", version = "0.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
 
 local_path_override(
     module_name = "debian_packages",
     path = "../..",
 )
+
+apt = use_extension(
+    "@debian_packages//apt:extensions.bzl",
+    "apt",
+    dev_dependency = True,
+)
+apt.source(
+    architectures = ["amd64"],
+    components = [
+        "main",
+        "universe",
+    ],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.download(
+    lockfile = "//:focal.lock.json",
+    packages = ["busybox"],
+)
+apt.install(name = "busybox")
+use_repo(apt, "busybox")

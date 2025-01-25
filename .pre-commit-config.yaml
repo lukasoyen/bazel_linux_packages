@@ -27,6 +27,7 @@ repos:
         exclude: |
           (?x)^(
             docs/
+            |.*lock.json
           )
       - id: trailing-whitespace
   # Check formatting and lint for starlark code
