@@ -1,4 +1,5 @@
-bazel-*
+/bazel-*
+/e2e/*/bazel-*
 .bazelrc.user
 .idea/
 .ijwb/
