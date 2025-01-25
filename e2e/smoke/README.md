@@ -1,5 +1,6 @@
-# smoke test
+# `busybox` smoke test
 
-This e2e exercises the repo from an end-users perspective.
-It catches mistakes in our install instructions, or usages that fail when called from an "external" repository to debian_packages.
-It is also used by the presubmit check for the Bazel Central Registry.
+The most basic use-case of installing a debian package that provides a binary
+without dependencies.
+
+Checks the general API and functionality.
