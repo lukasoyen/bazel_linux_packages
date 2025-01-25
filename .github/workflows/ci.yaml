@@ -27,7 +27,8 @@ jobs:
         [
           {"bzlmodEnabled": false},
           {"os": "windows-latest"},
-          {"os": "macos-latest"}
+          {"os": "macos-latest"},
+          {"bazelversion": "8.0.0rc1"}
         ]
   pre-commit:
     runs-on: ubuntu-latest
