@@ -12,7 +12,7 @@ create compiler toolchains and sysroots.
 Put the following in your `MODULE.bazel`. During the first setup a `*.lock.json`
 file will not exist. Run `bazel run @busybox//:lock` to create the lockfile.
 After that, `bazel run @busybox//:bin/busybox` should run the downloaded binary.
-See [e2e/smoke/MODULE.bazel](e2e/smoke/MODULE.bazel) for an end to end test.
+See [e2e/](e2e/README.md) for end to end tests.
 
 ```
 apt = use_extension("@debian_packages//apt:extensions.bzl", "apt", dev_dependency = True)
