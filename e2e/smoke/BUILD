@@ -17,7 +17,13 @@ genrule(
 diff_test(
     name = "echo_output",
     file1 = ":out.txt",
-    file2 = "expected.txt",
+    file2 = "expected_output.txt",
+)
+
+diff_test(
+    name = "manifest",
+    file1 = "@busybox//:manifest",
+    file2 = "expected_manifest.json",
 )
 
 build_test(

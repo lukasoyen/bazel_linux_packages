@@ -28,6 +28,7 @@ repos:
           (?x)^(
             docs/
             |.*lock.json
+            |.*/expected_manifest.json
           )
       - id: trailing-whitespace
   # Check formatting and lint for starlark code

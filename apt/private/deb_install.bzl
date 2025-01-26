@@ -39,6 +39,23 @@ def _extract_data_file(rctx, host_tar, path):
         ))
     _correct_symlinks(rctx, host_tar, path)
 
+def _list_for_manifest(rctx, host_tar, path):
+    cmd = [host_tar, "-tf", str(path)]
+    result = rctx.execute(cmd)
+    if result.return_code:
+        fail("Failed to list data file: {} ({}, {}, {})".format(
+            " ".join(cmd),
+            result.return_code,
+            result.stdout,
+            result.stderr,
+        ))
+
+    paths = []
+    for line in result.stdout.splitlines():
+        if not line.endswith("/"):
+            paths.append(line)
+    return paths
+
 def _deb_install_impl(rctx):
     host_tar = util.get_host_tool(rctx, "bsd_tar", "tar")
 
@@ -51,10 +68,19 @@ def _deb_install_impl(rctx):
                 "Misconfigured `sysroot()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
             )
 
+        manifest = dict()
         for package in index[rctx.attr.architecture]:
-            path = rctx.path(Label(package))
+            label = Label(package)
+            path = rctx.path(label)
             rctx.report_progress("Extracting data from package {}/{}".format(path.dirname.basename, path.basename))
             _extract_data_file(rctx, host_tar, path)
+            manifest["{}".format(label.name)] = _list_for_manifest(rctx, host_tar, path)
+
+        rctx.file(
+            "install_manifest.json",
+            json.encode_indent(manifest),
+            executable = False,
+        )
 
     rctx.template(
         "BUILD.bazel",
