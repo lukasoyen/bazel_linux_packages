@@ -33,6 +33,23 @@ apt.install(name = "busybox")
 use_repo(apt, "busybox")
 ```
 
+## Limitations
+
+- As packages are installed in a non-standard location, binaries might not find
+  their required libraries. Currently the systems loader will be used to load
+  required libraries and will most likely search system-wide. `LD_DEBUG` and
+  `LD_LIBRARY_PATH` can be used to fix this issue. See also
+  https://github.com/lukasoyen/bazel_debian_packages/issues/8.
+
+- As the packages are pulled for a Debian/Ubuntu distribution that is based on a
+  specific `glibc` version, incompatibilities can result in errors. The created
+  repository will contain the correct `glibc` version. But as said above the
+  binary will not necessarily find it.
+
+- If you manage to use the correct `glibc` version, it might be compiled against
+  a newer Linux kernel and error out. Use `file path/to/your/binary` to check
+  which kernel version is the minimum required.
+
 ## Related
 
 - [debian_dependency_bazelizer](https://github.com/shabanzd/debian_dependency_bazelizer)
