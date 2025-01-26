@@ -10,6 +10,7 @@ load("//apt/private:version_constraint.bzl", "version_constraint")
 def _resolve(rctx, input_hash, resolver, architectures, packages, include_transitive):
     lockf = lockfile.empty(rctx, input_hash)
     for arch in architectures:
+        rctx.report_progress("Resolving package constraints for {}".format(arch))
         dep_constraint_set = {}
         for dep_constraint in packages:
             if dep_constraint in dep_constraint_set:
@@ -143,6 +144,7 @@ def _extract_packages(rctx, lockf):
             package["version"],
             package["arch"],
         )
+        rctx.report_progress("Downloading package {}".format(package["name"]))
         rctx.download_and_extract(
             package["url"],
             sha256 = package["sha256"],
