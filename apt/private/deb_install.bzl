@@ -53,14 +53,14 @@ def _deb_install_impl(rctx):
 
         for package in index[rctx.attr.architecture]:
             path = rctx.path(Label(package))
+            rctx.report_progress("Extracting data from package {}/{}".format(path.dirname.basename, path.basename))
             _extract_data_file(rctx, host_tar, path)
 
     rctx.template(
         "BUILD.bazel",
         rctx.attr.build_file,
-        {
-            "{target_name}": rctx.attr.source,
-        },
+        {"{target_name}": rctx.attr.source},
+        executable = False,
     )
 
 deb_install = repository_rule(
