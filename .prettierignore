@@ -1,2 +1,3 @@
 docs/*.md
 *.lock.json
+expected_manifest.json
