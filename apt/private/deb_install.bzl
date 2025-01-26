@@ -82,6 +82,12 @@ def _deb_install_impl(rctx):
             executable = False,
         )
 
+    rctx.file(
+        "defs.bzl",
+        'def with_repository_prefix(path): return "external/{}/{{}}".format(path)'.format(rctx.attr.name),
+        executable = False,
+    )
+
     rctx.template(
         "BUILD.bazel",
         rctx.attr.build_file,

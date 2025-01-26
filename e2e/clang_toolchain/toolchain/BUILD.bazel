@@ -1,0 +1,73 @@
+load("@clang_toolchain//:defs.bzl", "with_repository_prefix")
+load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
+load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
+load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
+
+cc_sysroot(
+    name = "sysroot",
+    sysroot = "@clang_toolchain//:root",
+)
+
+cc_args(
+    name = "ld_library_path",
+    actions = ["@rules_cc//cc/toolchains/actions:all_actions"],
+    env = {"LD_LIBRARY_PATH": with_repository_prefix("usr/lib/x86_64-linux-gnu")},
+)
+
+cc_args(
+    name = "gold-linker",
+    actions = ["@rules_cc//cc/toolchains/actions:link_actions"],
+    args = ["-fuse-ld=gold"],
+)
+
+cc_args(
+    name = "no_canonical_prefixes",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:c_compile",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
+    ],
+    args = ["-no-canonical-prefixes"],
+)
+
+cc_args(
+    name = "determinism",
+    actions = [
+        "@rules_cc//cc/toolchains/actions:c_compile",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
+    ],
+    args = [
+        "-Wno-builtin-macro-redefined",
+        '-D__DATE__ "redacted"',
+        '-D__TIMESTAMP__ "redacted"',
+        '-D__TIME__ "redacted"',
+    ],
+)
+
+cc_toolchain(
+    name = "cc_toolchain",
+    args = [
+        ":sysroot",
+        ":ld_library_path",
+        ":gold-linker",
+        ":determinism",
+        ":no_canonical_prefixes",
+    ],
+    enabled_features = ["@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features"],
+    known_features = ["@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features"],
+    supports_param_files = True,
+    tool_map = "//toolchain/tools:tool_map",
+)
+
+toolchain(
+    name = "clang",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":cc_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)

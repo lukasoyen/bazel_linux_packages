@@ -1,0 +1,58 @@
+load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
+load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
+
+cc_tool(
+    name = "ar",
+    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-ar",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "asm",
+    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-as",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "clang++",
+    src = "@clang_toolchain//:usr/bin/clang++-10",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "clang",
+    src = "@clang_toolchain//:usr/bin/clang-10",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "ld",
+    src = "@clang_toolchain//:usr/bin/clang++-10",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "objcopy",
+    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-objcopy",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool(
+    name = "strip",
+    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-strip",
+    data = ["@clang_toolchain//:files"],
+)
+
+cc_tool_map(
+    name = "tool_map",
+    tools = {
+        "@rules_cc//cc/toolchains/actions:ar_actions": ":ar",
+        "@rules_cc//cc/toolchains/actions:assembly_actions": ":asm",
+        "@rules_cc//cc/toolchains/actions:c_compile": ":clang",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions": ":clang++",
+        "@rules_cc//cc/toolchains/actions:link_actions": ":ld",
+        "@rules_cc//cc/toolchains/actions:objcopy_embed_data": ":objcopy",
+        "@rules_cc//cc/toolchains/actions:strip": ":strip",
+    },
+    visibility = ["//visibility:public"],
+)
