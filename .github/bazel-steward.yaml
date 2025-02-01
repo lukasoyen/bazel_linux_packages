@@ -1,0 +1,5 @@
+update-rules:
+  - kinds: maven
+    enabled: false
+  - kinds: bazel-rules
+    enabled: false
