@@ -21,7 +21,8 @@ jobs:
         [
           ".",
           "e2e/smoke",
-          "e2e/llvm_toolchain"
+          "e2e/llvm_toolchain",
+          "e2e/clang_toolchain",
         ]
       exclude: |
         [
