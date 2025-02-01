@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix: {dir: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/clang_toolchain"]}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: VirtusLab/bazel-steward@v1.5.2
