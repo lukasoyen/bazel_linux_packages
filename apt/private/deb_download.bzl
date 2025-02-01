@@ -131,7 +131,7 @@ def _decompress_data_file(rctx, host_zstd, path):
             result.stdout,
             result.stderr,
         ))
-    return path
+    return output
 
 def _extract_packages(rctx, lockf):
     host_zstd = util.get_host_tool(rctx, "zstd", "zstd")

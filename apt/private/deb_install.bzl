@@ -2,8 +2,8 @@
 
 load("//apt/private:util.bzl", "util")
 
-def _correct_symlinks(rctx, host_tar, path):
-    cmd = [host_tar, "-tvf", str(path)]
+def _correct_symlinks(rctx, busybox, path):
+    cmd = [busybox, "tar", "-tvf", str(path)]
     result = rctx.execute(cmd)
     if result.return_code:
         fail("Failed to list data file: {} ({}, {}, {})".format(
@@ -27,8 +27,8 @@ def _correct_symlinks(rctx, host_tar, path):
                 # but that normalizes `new_target`
                 rctx.execute(["ln", "-s", new_target, name])
 
-def _extract_data_file(rctx, host_tar, path):
-    cmd = [host_tar, "-xf", str(path)]
+def _extract_data_file(rctx, busybox, path):
+    cmd = [busybox, "tar", "-xf", str(path)]
     result = rctx.execute(cmd)
     if result.return_code:
         fail("Failed to extract data file: {} ({}, {}, {})".format(
@@ -37,10 +37,10 @@ def _extract_data_file(rctx, host_tar, path):
             result.stdout,
             result.stderr,
         ))
-    _correct_symlinks(rctx, host_tar, path)
+    _correct_symlinks(rctx, busybox, path)
 
-def _list_for_manifest(rctx, host_tar, path):
-    cmd = [host_tar, "-tf", str(path)]
+def _list_for_manifest(rctx, busybox, path):
+    cmd = [busybox, "tar", "-tf", str(path)]
     result = rctx.execute(cmd)
     if result.return_code:
         fail("Failed to list data file: {} ({}, {}, {})".format(
@@ -57,7 +57,7 @@ def _list_for_manifest(rctx, host_tar, path):
     return paths
 
 def _deb_install_impl(rctx):
-    host_tar = util.get_host_tool(rctx, "bsd_tar", "tar")
+    busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")
 
     index = json.decode(rctx.read(util.get_repo_path(rctx, rctx.attr.source, "index.json")))
 
@@ -73,8 +73,8 @@ def _deb_install_impl(rctx):
             label = Label(package)
             path = rctx.path(label)
             rctx.report_progress("Extracting data from package {}/{}".format(path.dirname.basename, path.basename))
-            _extract_data_file(rctx, host_tar, path)
-            manifest["{}".format(label.name)] = _list_for_manifest(rctx, host_tar, path)
+            _extract_data_file(rctx, busybox, path)
+            manifest["{}".format(label.name)] = _list_for_manifest(rctx, busybox, path)
 
         rctx.file(
             "install_manifest.json",
