@@ -11,11 +11,12 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
     #  --force      -> overwrite the output if it exists
     #  --decompress -> decompress
     # Order of these matter, we want to try the one that is most likely first.
+    busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")
     supported_extensions = {
-        ".xz": ["xz", "--decompress", "--keep", "--force"],
-        ".gz": ["gzip", "--decompress", "--keep", "--force"],
-        ".bz2": ["bzip2", "--decompress", "--keep", "--force"],
-        "": ["true"],
+        ".xz": [busybox, "xz", "--decompress", "--keep", "--force"],
+        ".gz": [busybox, "gzip", "--decompress", "--keep", "--force"],
+        ".bz2": [busybox, "bzip2", "--decompress", "--keep", "--force"],
+        "": [busybox, "true"],
     }
 
     failed_attempts = []
