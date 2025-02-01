@@ -18,6 +18,15 @@ deb_archive(
     urls = ["https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/b/busybox/busybox-static_1.35.0-4%2Bb3_amd64.deb"],
 )
 
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "patchelf_linux_amd64",
+    build_file_content = "alias(name='patchelf', actual='bin/patchelf')",
+    integrity = "sha256-zoTyRH+3qGeeWLxUog3CsBs3tYAuEsV+7OdypvFL8/A=",
+    urls = ["https://github.com/NixOS/patchelf/releases/download/0.18.0/patchelf-0.18.0-x86_64.tar.gz"],
+)
+
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(bazel_lib_toolchains, "zstd_linux_amd64")
 

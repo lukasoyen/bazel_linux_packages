@@ -26,7 +26,10 @@ apt.download(
     lockfile = "//:focal.lock.json",
     packages = ["clang-10"],
 )
-apt.install(name = "clang_toolchain")
+apt.install(
+    name = "clang_toolchain",
+    fix_with_patchelf = True,
+)
 use_repo(apt, "clang_toolchain")
 
 register_toolchains("//toolchain:clang")
