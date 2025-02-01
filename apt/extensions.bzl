@@ -79,6 +79,7 @@ def _linux_toolchains_extension(module_ctx):
                 apparent_name = install.name,
                 architecture = architectures[0],
                 source = install.source,
+                fix_with_patchelf = install.fix_with_patchelf,
                 build_file = install.build_file,
             )
 
@@ -153,11 +154,15 @@ install = tag_class(
             mandatory = True,
         ),
         "architecture": attr.string(
-            doc = "Architectures for which to create the install (defaults to single value architecture from `source` if not given",
+            doc = "Architectures for which to create the install (defaults to single value architecture from `source` if not given)",
         ),
         "source": attr.string(
-            doc = "download() repositorie to unpack packages from",
+            doc = "download() repositories to unpack packages from",
             default = "download",
+        ),
+        "fix_with_patchelf": attr.bool(
+            doc = "Whether to fix the RPATH/interpreter of executables/libraries using `patchelf`",
+            default = False,
         ),
         "build_file": attr.label(
             doc = "Experimental: BUILD.bazel template for the generated install dir.",
