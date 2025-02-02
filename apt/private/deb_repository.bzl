@@ -13,9 +13,9 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
     # Order of these matter, we want to try the one that is most likely first.
     busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")
     supported_extensions = {
-        ".xz": [busybox, "xz", "--decompress", "--keep", "--force"],
-        ".gz": [busybox, "gzip", "--decompress", "--keep", "--force"],
-        ".bz2": [busybox, "bzip2", "--decompress", "--keep", "--force"],
+        ".xz": [busybox, "xz", "-d", "-k", "-f"],
+        ".gz": [busybox, "gzip", "-d", "-k", "-f"],
+        ".bz2": [busybox, "bzip2", "-d", "-k", "-f"],
         "": [busybox, "true"],
     }
 
