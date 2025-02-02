@@ -8,3 +8,4 @@ check for the Bazel Central Registry.
 - [`busybox` smoke test](smoke/README.md)
 - [`llvm_toolchain` syroot test](llvm_toolchain/README.md)
 - [`clang` toolchain test](clang_toolchain/README.md)
+- [`gcc` toolchain test](gcc_toolchain/README.md)
