@@ -149,7 +149,7 @@ def _fixup_executables(rctx, busybox, patchelf):
     ]:
         for path in _list_files(rctx, busybox, directory, "-maxdepth", "1"):
             realpath = str(rctx.path(path).realpath).removeprefix(pwd)
-            if realpath not in seen:
+            if realpath not in seen and not any([realpath.endswith(e) for e in (".o", ".a")]):
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
                 if interpreter != None:
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
