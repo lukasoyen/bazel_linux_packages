@@ -30,20 +30,41 @@ apt.install(name = "busybox")
 use_repo(apt, "busybox")
 ```
 
-See [e2e/](e2e/README.md) for end to end tests.
+See [e2e/](e2e/README.md) for end to end tests and
+[the extension docs](docs/extensions.md) for more details:
 
-## Limitations
+- [`apt.source()`](docs/extensions.md#source)
+- [`apt.download()`](docs/extensions.md#download)
+- [`apt.install()`](docs/extensions.md#install)
 
-- As packages are installed in a non-standard location, binaries might not find
-  their required libraries. Currently the systems loader will be used to load
-  required libraries and will most likely search system-wide. `LD_DEBUG` and
-  `LD_LIBRARY_PATH` can be used to fix this issue. See also
-  https://github.com/lukasoyen/bazel_debian_packages/issues/8.
+## Handle Library Paths
 
-- As the packages are pulled for a Debian/Ubuntu distribution that is based on a
-  specific `glibc` version, incompatibilities can result in errors. The created
-  repository will contain the correct `glibc` version. But as said above the
-  binary will not necessarily find it.
+- As packages are installed in a non-standard location, binaries might not
+  find their required libraries. Additionally, as the packages are pulled for
+  a Debian/Ubuntu distribution that is based on a specific `glibc` version,
+  incompatibilities can result in errors. The created repository will contain
+  the correct `glibc` version. There are two strategies to handle these:
+
+  1. The systems' loader will be used to load required libraries and will search
+     system-wide. `LD_LIBRARY_PATH` can be used to set directories to search.
+     `LD_DEBUG` can be used to debug missing library issues. The generated
+     repository exposes `with_repository_prefix()` that returns the `exec`-root
+     relative path to it. It can be used like:
+
+  ```py
+  load("@my_repository//:defs.bzl", "with_repository_prefix")
+
+  my_rule(
+      [...]
+      env = {"LD_LIBRARY_PATH": with_repository_prefix("usr/lib/x86_64-linux-gnu")},
+  )
+  ```
+
+  2. Set `fix_with_patchelf = True` for
+     [`apt.install()`](docs/extensions.md#install). This will use
+     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables and
+     binaries to add library search directories to `RUNPATH` and set the
+     interpreter binary (`ld.so`).
 
 - If you manage to use the correct `glibc` version, it might be compiled against
   a newer Linux kernel and error out. Use `file path/to/your/binary` to check
