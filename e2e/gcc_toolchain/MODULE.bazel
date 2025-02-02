@@ -1,0 +1,32 @@
+bazel_dep(name = "debian_packages", version = "0.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "rules_cc", version = "0.1.0")
+bazel_dep(name = "platforms", version = "0.0.11")
+
+local_path_override(
+    module_name = "debian_packages",
+    path = "../..",
+)
+
+apt = use_extension(
+    "@debian_packages//apt:extensions.bzl",
+    "apt",
+    dev_dependency = True,
+)
+apt.source(
+    architectures = ["amd64"],
+    components = ["main"],
+    suites = ["bookworm"],
+    uri = "https://snapshot.debian.org/archive/debian/20250201T023325Z",
+)
+apt.download(
+    lockfile = ":bookworm.lock.json",
+    packages = ["g++-12"],
+)
+apt.install(
+    name = "gcc_toolchain",
+    fix_with_patchelf = True,
+)
+use_repo(apt, "gcc_toolchain")
+
+register_toolchains("//toolchain:gcc")

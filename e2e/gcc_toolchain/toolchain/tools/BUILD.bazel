@@ -1,0 +1,58 @@
+load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
+load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
+
+cc_tool(
+    name = "ar",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-ar",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "asm",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-as",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "g++",
+    src = "wrapper.sh",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "gcc",
+    src = "wrapper.sh",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "ld",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "objcopy",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-objcopy",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool(
+    name = "strip",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-strip",
+    data = ["@gcc_toolchain//:files"],
+)
+
+cc_tool_map(
+    name = "tool_map",
+    tools = {
+        "@rules_cc//cc/toolchains/actions:ar_actions": ":ar",
+        "@rules_cc//cc/toolchains/actions:assembly_actions": ":asm",
+        "@rules_cc//cc/toolchains/actions:c_compile": ":gcc",
+        "@rules_cc//cc/toolchains/actions:cpp_compile_actions": ":g++",
+        "@rules_cc//cc/toolchains/actions:link_actions": ":ld",
+        "@rules_cc//cc/toolchains/actions:objcopy_embed_data": ":objcopy",
+        "@rules_cc//cc/toolchains/actions:strip": ":strip",
+    },
+    visibility = ["//visibility:public"],
+)

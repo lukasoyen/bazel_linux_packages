@@ -23,6 +23,7 @@ jobs:
           "e2e/smoke",
           "e2e/llvm_toolchain",
           "e2e/clang_toolchain",
+          "e2e/gcc_toolchain",
         ]
       exclude: |
         [
