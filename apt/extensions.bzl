@@ -1,4 +1,27 @@
-"apt extensions"
+"""
+# Extension for downloading and extracting Debian/Ubuntu packages.
+
+## Usage
+Place the following in your `MODULE.bazel`. Then:
+- run `bazel run @busybox//:lock` to create a lockfile and
+- run `bazel run @busybox//:bin/busybox` to download/extract the package and run the binary.
+
+```py
+apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
+apt.source(
+    architectures = ["amd64"],
+    components = ["main"],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.download(
+    lockfile = "//:focal.lock.json",
+    packages = ["busybox"],
+)
+apt.install(name = "busybox")
+use_repo(apt, "busybox")
+```
+"""
 
 load("//apt/private:deb_download.bzl", "deb_download")
 load("//apt/private:deb_install.bzl", "deb_install")
@@ -95,6 +118,44 @@ def _linux_toolchains_extension(module_ctx):
     )
 
 source = tag_class(
+    doc = """
+    Set the Debian/Ubuntu repository to download from.
+
+    This will create an internal repository that contains the extracted
+    Ubuntu/Debian package index files.
+
+    Parameters roughly follow the
+    [DEB822](https://manpages.debian.org/unstable/apt/sources.list.5.en.html#DEB822-STYLE_FORMAT).
+    This allows you copy and adapt from the sources.list.
+
+    For example
+    ```
+    Types: deb
+    URIs: http://deb.debian.org/debian
+    Suites: trixie
+    Components: main
+    Architectures: amd64 armel
+    ```
+
+    would be translated into
+    ```
+    apt.source(
+        architectures = ["amd64", "armel"],
+        components = ["main"],
+        suites = ["trixie"],
+        uri = "http://deb.debian.org/debian",
+    )
+    ```
+
+    It is strogly advised to use archive URLs to ensure stability of the
+    retrieved package index files to be able to re-generate the same lockfiles.
+    - Ubuntu: https://snapshot.ubuntu.com/ubuntu/20250115T150000Z
+    - Debian: https://snapshot.debian.org/archive/debian/20250115T150000Z
+
+    Multiple `source()` tags are allowed but need unique names. The
+    corresponding `download()` tags need to then refer to them by the `sources`
+    attribute.
+    """,
     attrs = {
         "name": attr.string(
             doc = "Name of the generated repository",
@@ -120,6 +181,23 @@ source = tag_class(
 )
 
 download = tag_class(
+    doc = """
+    Download a set of `packages` from specified `sources`.
+
+    This will create two internal repositories. One will contain a generated
+    lockfile, the other will contain the downloaded `*.deb` archives and their
+    extracted files.
+
+    The `lockfile` attribute is mandatory, but does not need to exist during the
+    initial setup. If the attribute is set to a non-existing file a mostly empty
+    repository that only exposes the target to copy the lockfile into the
+    workspace is created.
+
+    Multiple `download()` tags are allowed but need unique names. The
+    corresponding `source()` tag needs to be specified by the `sources`
+    attribute. The corresponding `install()` tags need to then refer to them by
+    the `source` attribute.
+    """,
     attrs = {
         "name": attr.string(
             doc = "Name of the generated repository",
@@ -130,7 +208,7 @@ download = tag_class(
             default = ["source"],
         ),
         "architectures": attr.string_list(
-            doc = "Architectures for which to download packages (defaults to architectures from `sources` if not given",
+            doc = "Architectures for which to download packages (defaults to architectures from `sources` if not given)",
         ),
         "packages": attr.string_list(
             doc = "Packages to download",
@@ -148,6 +226,20 @@ download = tag_class(
     },
 )
 install = tag_class(
+    doc = """
+    Install the contents of the downloaded `*.deb` data archives.
+
+    This will create the user facing repository containing the files from
+    "installing" the `*.deb` packages. The packages are only extracted, no
+    install hooks will be executed.
+
+    In most cases you need to consider how to handle library paths. See the
+    [Handle Library Paths](../README.md#handle-library-paths) for details.
+
+    Multiple `install()` tags are allowed but need unique names. The
+    corresponding `download()` tag needs to be specified by the `source`
+    attribute.
+    """,
     attrs = {
         "name": attr.string(
             doc = "Name of the generated repository",

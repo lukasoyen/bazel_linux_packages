@@ -1,6 +1,27 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-apt extensions
+# Extension for downloading and extracting Debian/Ubuntu packages.
+
+## Usage
+Place the following in your `MODULE.bazel`. Then:
+- run `bazel run @busybox//:lock` to create a lockfile and
+- run `bazel run @busybox//:bin/busybox` to download/extract the package and run the binary.
+
+```py
+apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
+apt.source(
+    architectures = ["amd64"],
+    components = ["main"],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.download(
+    lockfile = "//:focal.lock.json",
+    packages = ["busybox"],
+)
+apt.install(name = "busybox")
+use_repo(apt, "busybox")
+```
 
 <a id="apt"></a>
 
@@ -20,6 +41,43 @@ apt.install(<a href="#apt.install-name">name</a>, <a href="#apt.install-architec
 
 ### source
 
+Set the Debian/Ubuntu repository to download from.
+
+This will create an internal repository that contains the extracted
+Ubuntu/Debian package index files.
+
+Parameters roughly follow the
+[DEB822](https://manpages.debian.org/unstable/apt/sources.list.5.en.html#DEB822-STYLE_FORMAT).
+This allows you copy and adapt from the sources.list.
+
+For example
+```
+Types: deb
+URIs: http://deb.debian.org/debian
+Suites: trixie
+Components: main
+Architectures: amd64 armel
+```
+
+would be translated into
+```
+apt.source(
+    architectures = ["amd64", "armel"],
+    components = ["main"],
+    suites = ["trixie"],
+    uri = "http://deb.debian.org/debian",
+)
+```
+
+It is strogly advised to use archive URLs to ensure stability of the
+retrieved package index files to be able to re-generate the same lockfiles.
+- Ubuntu: https://snapshot.ubuntu.com/ubuntu/20250115T150000Z
+- Debian: https://snapshot.debian.org/archive/debian/20250115T150000Z
+
+Multiple `source()` tags are allowed but need unique names. The
+corresponding `download()` tags need to then refer to them by the `sources`
+attribute.
+
 **Attributes**
 
 | Name  | Description | Type | Mandatory | Default |
@@ -34,12 +92,28 @@ apt.install(<a href="#apt.install-name">name</a>, <a href="#apt.install-architec
 
 ### download
 
+Download a set of `packages` from specified `sources`.
+
+This will create two internal repositories. One will contain a generated
+lockfile, the other will contain the downloaded `*.deb` archives and their
+extracted files.
+
+The `lockfile` attribute is mandatory, but does not need to exist during the
+initial setup. If the attribute is set to a non-existing file a mostly empty
+repository that only exposes the target to copy the lockfile into the
+workspace is created.
+
+Multiple `download()` tags are allowed but need unique names. The
+corresponding `source()` tag needs to be specified by the `sources`
+attribute. The corresponding `install()` tags need to then refer to them by
+the `source` attribute.
+
 **Attributes**
 
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="apt.download-name"></a>name |  Name of the generated repository   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | optional |  `"download"`  |
-| <a id="apt.download-architectures"></a>architectures |  Architectures for which to download packages (defaults to architectures from `sources` if not given   | List of strings | optional |  `[]`  |
+| <a id="apt.download-architectures"></a>architectures |  Architectures for which to download packages (defaults to architectures from `sources` if not given)   | List of strings | optional |  `[]`  |
 | <a id="apt.download-lockfile"></a>lockfile |  The lock file to use for the index (it is fine for the file to not exist yet)   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="apt.download-packages"></a>packages |  Packages to download   | List of strings | required |  |
 | <a id="apt.download-resolve_transitive"></a>resolve_transitive |  Whether dependencies of dependencies should be resolved and added to the lockfile.   | Boolean | optional |  `True`  |
@@ -48,6 +122,19 @@ apt.install(<a href="#apt.install-name">name</a>, <a href="#apt.install-architec
 <a id="apt.install"></a>
 
 ### install
+
+Install the contents of the downloaded `*.deb` data archives.
+
+This will create the user facing repository containing the files from
+"installing" the `*.deb` packages. The packages are only extracted, no
+install hooks will be executed.
+
+In most cases you need to consider how to handle library paths. See the
+[Handle Library Paths](../README.md#handle-library-paths) for details.
+
+Multiple `install()` tags are allowed but need unique names. The
+corresponding `download()` tag needs to be specified by the `source`
+attribute.
 
 **Attributes**
 
