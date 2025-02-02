@@ -1,4 +1,4 @@
-# Bazel extension for downloading and extracting debian packages
+# Bazel Extension for downloading and extracting Debian/Ubuntu packages.
 
 This `bazel` extension enables downloading and extracting `*.deb` into a `bazel`
 repository. This can be used to run binaries packaged as `*.deb` packages or
@@ -9,19 +9,16 @@ create compiler toolchains and sysroots.
 
 ## Usage
 
-Put the following in your `MODULE.bazel`. During the first setup a `*.lock.json`
-file will not exist. Run `bazel run @busybox//:lock` to create the lockfile.
-After that, `bazel run @busybox//:bin/busybox` should run the downloaded binary.
-See [e2e/](e2e/README.md) for end to end tests.
+Place the following in your `MODULE.bazel`. Then:
 
-```
-apt = use_extension("@debian_packages//apt:extensions.bzl", "apt", dev_dependency = True)
+- run `bazel run @busybox//:lock` to create a lockfile and
+- run `bazel run @busybox//:bin/busybox` to download/extract the package and run the binary.
+
+```py
+apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
 apt.source(
     architectures = ["amd64"],
-    components = [
-        "main",
-        "universe",
-    ],
+    components = ["main"],
     suites = ["focal"],
     uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
 )
@@ -32,6 +29,8 @@ apt.download(
 apt.install(name = "busybox")
 use_repo(apt, "busybox")
 ```
+
+See [e2e/](e2e/README.md) for end to end tests.
 
 ## Limitations
 
