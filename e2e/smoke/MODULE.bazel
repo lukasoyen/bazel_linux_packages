@@ -13,10 +13,7 @@ apt = use_extension(
 )
 apt.source(
     architectures = ["amd64"],
-    components = [
-        "main",
-        "universe",
-    ],
+    components = ["main"],
     suites = ["focal"],
     uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
 )
