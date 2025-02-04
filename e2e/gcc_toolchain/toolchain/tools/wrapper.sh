@@ -13,10 +13,10 @@
 # This wrapper requires the actual compiler to be passed as the first argument
 readonly gcc="$1"; shift
 
-readonly dotd="$(echo "$@" | grep -o "\-MF [^ ]*.d" | cut -d' ' -f2)"
+readonly dotd="$(echo "$@" | grep -o "\-MF [^ ]*.d" | cut -d' ' -f2 || echo "")"
 "${gcc}" "$@"
 readonly ret=$?
-if [[ -n "${dotd}" ]] then
+if [[ -n "${dotd}" ]]; then
   sed -i "s:$(realpath $(pwd))/::" "${dotd}"
 fi
 exit $ret
