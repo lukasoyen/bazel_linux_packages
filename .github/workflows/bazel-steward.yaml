@@ -7,7 +7,7 @@ jobs:
   bazel-steward:
     runs-on: ubuntu-latest
     strategy:
-      matrix: {dir: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/clang_toolchain", "e2e/gcc_toolchain"]}
+      matrix: {dir: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/toolchains"]}
     steps:
       - uses: actions/checkout@v4
         with:

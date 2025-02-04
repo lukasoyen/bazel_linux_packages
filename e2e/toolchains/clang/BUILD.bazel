@@ -1,44 +1,17 @@
-load("@gcc_toolchain//:defs.bzl", "with_repository_prefix")
+load("@clang_toolchain//:defs.bzl", "with_repository_prefix")
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
-load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
 load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
 
 cc_sysroot(
     name = "sysroot",
-    sysroot = "@gcc_toolchain//:root",
+    sysroot = "@clang_toolchain//:root",
 )
 
 cc_args(
-    name = "inject_gcc",
-    actions = ["@rules_cc//cc/toolchains/actions:c_compile"],
-    args = ["x86_64-linux-gnu-gcc-12"],
-)
-
-cc_args(
-    name = "inject_g++",
-    actions = ["@rules_cc//cc/toolchains/actions:cpp_compile"],
-    args = ["x86_64-linux-gnu-g++-12"],
-)
-
-cc_args_list(
-    name = "inject_compiler",
-    args = [
-        ":inject_gcc",
-        ":inject_g++",
-    ],
-)
-
-cc_args(
-    name = "exec_prefix",
+    name = "ld_library_path",
     actions = ["@rules_cc//cc/toolchains/actions:all_actions"],
-    env = {
-        "GCC_EXEC_PREFIX": with_repository_prefix("usr/lib/gcc/"),
-        "PATH": ":".join([
-            with_repository_prefix("usr/bin/"),
-            "/bin:/usr/bin:/usr/local/bin",
-        ]),
-    },
+    env = {"LD_LIBRARY_PATH": with_repository_prefix("usr/lib/x86_64-linux-gnu")},
 )
 
 cc_args(
@@ -53,10 +26,7 @@ cc_args(
         "@rules_cc//cc/toolchains/actions:c_compile",
         "@rules_cc//cc/toolchains/actions:cpp_compile_actions",
     ],
-    args = [
-        "-fno-canonical-system-headers",
-        "--no-canonical-prefixes",
-    ],
+    args = ["-no-canonical-prefixes"],
 )
 
 cc_args(
@@ -76,24 +46,21 @@ cc_args(
 cc_toolchain(
     name = "cc_toolchain",
     args = [
-        # The targets `gcc_file`, `inject_gcc`, `g++_file`, `inject_g++`, and `inject_compile`
-        # should not be necessary if the Ubuntu/Debian compiler would behave correctly.
-        # See comment in `wrapper.sh`.
-        ":inject_compiler",
         ":sysroot",
-        ":exec_prefix",
-        ":determinism",
+        # This is the alternative to the `fix_with_patchelf=True` in `install()`
+        #":ld_library_path",
         ":gold-linker",
+        ":determinism",
         ":no_canonical_prefixes",
     ],
     enabled_features = ["@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features"],
     known_features = ["@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features"],
     supports_param_files = True,
-    tool_map = "//toolchain/tools:tool_map",
+    tool_map = "//clang/tools:tool_map",
 )
 
 toolchain(
-    name = "gcc",
+    name = "clang",
     exec_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
@@ -101,6 +68,7 @@ toolchain(
     target_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:x86_64",
+        "//constraints:clang",
     ],
     toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",

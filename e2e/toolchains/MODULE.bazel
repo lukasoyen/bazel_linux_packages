@@ -2,6 +2,7 @@ bazel_dep(name = "linux_packages", version = "0.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_cc", version = "0.1.0")
 bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "rules_platform", version = "0.1.0")
 
 local_path_override(
     module_name = "linux_packages",
@@ -14,20 +15,49 @@ apt = use_extension(
     dev_dependency = True,
 )
 apt.source(
+    name = "focal",
+    architectures = ["amd64"],
+    components = [
+        "main",
+        "universe",
+    ],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.download(
+    name = "focal_clang",
+    lockfile = "//:focal.lock.json",
+    packages = ["clang-10"],
+    sources = ["focal"],
+)
+apt.install(
+    name = "clang_toolchain",
+    fix_with_patchelf = True,
+    source = "focal_clang",
+)
+use_repo(apt, "clang_toolchain")
+
+register_toolchains("//clang")
+
+apt.source(
+    name = "bookworm",
     architectures = ["amd64"],
     components = ["main"],
     suites = ["bookworm"],
     uri = "https://snapshot.debian.org/archive/debian/20250201T023325Z",
 )
 apt.download(
+    name = "bookworm_gcc",
     lockfile = ":bookworm.lock.json",
     packages = ["g++-12"],
+    sources = ["bookworm"],
 )
 apt.install(
     name = "gcc_toolchain",
     extra_patchelf_dirs = ["usr/lib/gcc/x86_64-linux-gnu/12"],
     fix_with_patchelf = True,
+    source = "bookworm_gcc",
 )
 use_repo(apt, "gcc_toolchain")
 
-register_toolchains("//toolchain:gcc")
+register_toolchains("//gcc")
