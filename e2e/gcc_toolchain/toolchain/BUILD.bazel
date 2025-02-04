@@ -9,28 +9,16 @@ cc_sysroot(
     sysroot = "@gcc_toolchain//:root",
 )
 
-filegroup(
-    name = "gcc_file",
-    srcs = ["@gcc_toolchain//:usr/bin/x86_64-linux-gnu-gcc-12"],
-)
-
 cc_args(
     name = "inject_gcc",
     actions = ["@rules_cc//cc/toolchains/actions:c_compile"],
-    args = ["{binary}"],
-    format = {"binary": ":gcc_file"},
-)
-
-filegroup(
-    name = "g++_file",
-    srcs = ["@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12"],
+    args = ["x86_64-linux-gnu-gcc-12"],
 )
 
 cc_args(
     name = "inject_g++",
     actions = ["@rules_cc//cc/toolchains/actions:cpp_compile"],
-    args = ["{binary}"],
-    format = {"binary": ":g++_file"},
+    args = ["x86_64-linux-gnu-g++-12"],
 )
 
 cc_args_list(
@@ -44,7 +32,13 @@ cc_args_list(
 cc_args(
     name = "exec_prefix",
     actions = ["@rules_cc//cc/toolchains/actions:all_actions"],
-    env = {"GCC_EXEC_PREFIX": with_repository_prefix("usr/lib/gcc/")},
+    env = {
+        "GCC_EXEC_PREFIX": with_repository_prefix("usr/lib/gcc/"),
+        "PATH": ":".join([
+            with_repository_prefix("usr/bin/"),
+            "/bin:/usr/bin:/usr/local/bin",
+        ]),
+    },
 )
 
 cc_args(
@@ -89,6 +83,7 @@ cc_toolchain(
         ":sysroot",
         ":exec_prefix",
         ":determinism",
+        ":gold-linker",
         ":no_canonical_prefixes",
     ],
     enabled_features = ["@rules_cc//cc/toolchains/args:experimental_replace_legacy_action_config_features"],
