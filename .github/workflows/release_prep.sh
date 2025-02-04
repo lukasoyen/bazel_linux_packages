@@ -12,6 +12,6 @@ cat << EOF
 2. Add to your \`MODULE.bazel\` file:
 
 \`\`\`starlark
-bazel_dep(name = "debian_packages", version = "${TAG:1}")
+bazel_dep(name = "linux_packages", version = "${TAG:1}")
 \`\`\`
 EOF
