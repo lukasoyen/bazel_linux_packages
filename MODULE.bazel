@@ -18,6 +18,12 @@ deb_archive(
     urls = ["https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/b/busybox/busybox-static_1.35.0-4%2Bb3_amd64.deb"],
 )
 
+deb_archive(
+    name = "busybox_linux_arm64",
+    integrity = "sha256-C0+0zi0/0Woc11BTX5d1ugxC2GOeE9ZjUka6g6DUvc8=",
+    urls = ["https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/b/busybox/busybox-static_1.35.0-4%2Bb3_arm64.deb"],
+)
+
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -27,8 +33,16 @@ http_archive(
     urls = ["https://github.com/NixOS/patchelf/releases/download/0.18.0/patchelf-0.18.0-x86_64.tar.gz"],
 )
 
+http_archive(
+    name = "patchelf_linux_arm64",
+    build_file_content = "alias(name='patchelf', actual='bin/patchelf')",
+    integrity = "sha256-rhPi7/4HfoKb51kYI5a5Mdj4XPuc/p1JOFUW6jZ+97I=",
+    urls = ["https://github.com/NixOS/patchelf/releases/download/0.18.0/patchelf-0.18.0-aarch64.tar.gz"],
+)
+
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(bazel_lib_toolchains, "zstd_linux_amd64")
+use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
 
 # Dev dependencies
 bazel_dep(name = "gazelle", version = "0.42.0", dev_dependency = True, repo_name = "bazel_gazelle")
