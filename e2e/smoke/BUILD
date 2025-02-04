@@ -4,7 +4,10 @@ load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 
 native_binary(
     name = "busybox",
-    src = "@busybox//:bin/busybox",
+    src = select({
+        "@platforms//cpu:x86_64": "@busybox_amd64//:bin/busybox",
+        "@platforms//cpu:arm64": "@busybox_arm64//:bin/busybox",
+    }),
 )
 
 genrule(
@@ -21,15 +24,18 @@ diff_test(
 )
 
 diff_test(
-    name = "manifest",
-    file1 = "@busybox//:manifest",
-    file2 = "expected_manifest.json",
+    name = "manifest_amd64",
+    file1 = "@busybox_amd64//:manifest",
+    file2 = "expected_manifest_amd64.json",
+)
+
+diff_test(
+    name = "manifest_arm64",
+    file1 = "@busybox_arm64//:manifest",
+    file2 = "expected_manifest_arm64.json",
 )
 
 build_test(
     name = "smoke_test",
-    targets = [
-        ":busybox",
-        ":echo",
-    ],
+    targets = [":echo"],
 )

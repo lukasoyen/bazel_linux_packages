@@ -1,0 +1,21 @@
+{
+	"packages/busybox-static_1-1.30.1-4ubuntu6_arm64/data.tar": [
+		"./bin/busybox",
+		"./usr/share/doc/busybox-static/changelog.Debian.gz",
+		"./usr/share/doc/busybox-static/copyright",
+		"./usr/share/doc/busybox-static/examples/mdev.conf",
+		"./usr/share/doc/busybox-static/examples/mdev.conf.change_blockdev.sh",
+		"./usr/share/doc/busybox-static/examples/mdev_fat.conf.gz",
+		"./usr/share/doc/busybox-static/examples/udhcp/sample.bound",
+		"./usr/share/doc/busybox-static/examples/udhcp/sample.deconfig",
+		"./usr/share/doc/busybox-static/examples/udhcp/sample.nak",
+		"./usr/share/doc/busybox-static/examples/udhcp/sample.renew",
+		"./usr/share/doc/busybox-static/examples/udhcp/sample.script",
+		"./usr/share/doc/busybox-static/examples/udhcp/simple.script",
+		"./usr/share/doc/busybox-static/examples/udhcp/udhcpd.conf.gz",
+		"./usr/share/doc/busybox-static/mdev.txt.gz",
+		"./usr/share/doc/busybox-static/syslog.conf.txt",
+		"./usr/share/man/man1/busybox.1.gz",
+		"./bin/static-sh"
+	]
+}

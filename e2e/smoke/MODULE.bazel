@@ -1,4 +1,5 @@
 bazel_dep(name = "linux_packages", version = "0.0.0")
+bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 
 local_path_override(
@@ -12,14 +13,32 @@ apt = use_extension(
     dev_dependency = True,
 )
 apt.source(
-    architectures = ["amd64"],
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
     components = ["main"],
     suites = ["focal"],
     uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
 )
 apt.download(
-    lockfile = "//:focal.lock.json",
+    name = "download_busybox_amd64",
+    architectures = ["amd64"],
+    lockfile = "//:focal_amd64.lock.json",
     packages = ["busybox"],
 )
-apt.install(name = "busybox")
-use_repo(apt, "busybox")
+apt.install(
+    name = "busybox_amd64",
+    source = "download_busybox_amd64",
+)
+apt.download(
+    name = "download_busybox_arm64",
+    architectures = ["arm64"],
+    lockfile = "//:focal_arm64.lock.json",
+    packages = ["busybox"],
+)
+apt.install(
+    name = "busybox_arm64",
+    source = "download_busybox_arm64",
+)
+use_repo(apt, "busybox_amd64", "busybox_arm64")
