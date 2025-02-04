@@ -8,7 +8,7 @@ Place the following in your `MODULE.bazel`. Then:
 - run `bazel run @busybox//:bin/busybox` to download/extract the package and run the binary.
 
 ```py
-apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
+apt = use_extension("@linux_packages//apt:extensions.bzl", "apt")
 apt.source(
     architectures = ["amd64"],
     components = ["main"],
@@ -28,7 +28,7 @@ use_repo(apt, "busybox")
 ## apt
 
 <pre>
-apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
+apt = use_extension("@linux_packages//apt:extensions.bzl", "apt")
 apt.source(<a href="#apt.source-name">name</a>, <a href="#apt.source-architectures">architectures</a>, <a href="#apt.source-components">components</a>, <a href="#apt.source-suites">suites</a>, <a href="#apt.source-uri">uri</a>)
 apt.download(<a href="#apt.download-name">name</a>, <a href="#apt.download-architectures">architectures</a>, <a href="#apt.download-lockfile">lockfile</a>, <a href="#apt.download-packages">packages</a>, <a href="#apt.download-resolve_transitive">resolve_transitive</a>, <a href="#apt.download-sources">sources</a>)
 apt.install(<a href="#apt.install-name">name</a>, <a href="#apt.install-architecture">architecture</a>, <a href="#apt.install-build_file">build_file</a>, <a href="#apt.install-fix_with_patchelf">fix_with_patchelf</a>, <a href="#apt.install-source">source</a>)
@@ -142,7 +142,7 @@ attribute.
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="apt.install-name"></a>name |  Name of the generated repository   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="apt.install-architecture"></a>architecture |  Architectures for which to create the install (defaults to single value architecture from `source` if not given)   | String | optional |  `""`  |
-| <a id="apt.install-build_file"></a>build_file |  Experimental: BUILD.bazel template for the generated install dir.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@debian_packages//apt:install.BUILD.bazel.tmpl"`  |
+| <a id="apt.install-build_file"></a>build_file |  Experimental: BUILD.bazel template for the generated install dir.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@linux_packages//apt:install.BUILD.bazel.tmpl"`  |
 | <a id="apt.install-fix_with_patchelf"></a>fix_with_patchelf |  Whether to fix the RPATH/interpreter of executables/libraries using `patchelf`   | Boolean | optional |  `False`  |
 | <a id="apt.install-source"></a>source |  download() repositories to unpack packages from   | String | optional |  `"download"`  |
 

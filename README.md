@@ -5,7 +5,7 @@ repository. This can be used to run binaries packaged as `*.deb` packages or
 create compiler toolchains and sysroots.
 
 > [!IMPORTANT]
-> This is not a ruleset to create `*.deb` packages.
+> This is not a ruleset to create `*.deb` ore other Linux distribution packages.
 
 ## Usage
 
@@ -15,7 +15,7 @@ Place the following in your `MODULE.bazel`. Then:
 - run `bazel run @busybox//:bin/busybox` to download/extract the package and run the binary.
 
 ```py
-apt = use_extension("@debian_packages//apt:extensions.bzl", "apt")
+apt = use_extension("@linux_packages//apt:extensions.bzl", "apt")
 apt.source(
     architectures = ["amd64"],
     components = ["main"],

@@ -1,7 +1,7 @@
 {
-  "homepage": "https://github.com/lukasoyen/debian_packages",
+  "homepage": "https://github.com/lukasoyen/linux_packages",
   "maintainers": [],
-  "repository": ["github:lukasoyen/debian_packages"],
+  "repository": ["github:lukasoyen/linux_packages"],
   "versions": [],
   "yanked_versions": {}
 }
