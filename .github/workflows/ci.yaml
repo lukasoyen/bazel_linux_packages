@@ -33,6 +33,9 @@ jobs:
           bazelrc: |
             common --announce_rc
             common --color=yes
+            build --disk_cache=~/.cache/bazel
+            test --test_output=errors
+            test --test_env=XDG_CACHE_HOME
       - name: Configure Bazel version
         working-directory: ${{ matrix.folder }}
         run: |
