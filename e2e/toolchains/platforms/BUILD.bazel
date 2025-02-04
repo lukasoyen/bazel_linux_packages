@@ -1,0 +1,19 @@
+platform(
+    name = "gcc",
+    constraint_values = [
+        "//constraints:gcc",
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "clang",
+    constraint_values = [
+        "//constraints:clang",
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    visibility = ["//visibility:public"],
+)
