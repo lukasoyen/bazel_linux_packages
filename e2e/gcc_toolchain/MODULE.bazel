@@ -25,6 +25,7 @@ apt.download(
 )
 apt.install(
     name = "gcc_toolchain",
+    extra_patchelf_dirs = ["usr/lib/gcc/x86_64-linux-gnu/12"],
     fix_with_patchelf = True,
 )
 use_repo(apt, "gcc_toolchain")
