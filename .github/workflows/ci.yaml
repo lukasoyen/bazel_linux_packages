@@ -19,9 +19,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: ["ubuntu-22.04"]
         bazelversion: [8.0.1]
         folder: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/toolchains"]
+        include:
+          - os: "ubuntu-22.04-arm"
+            folder: "e2e/smoke"
     steps:
       - uses: actions/checkout@v4
       - uses: bazel-contrib/setup-bazel@0.8.0
