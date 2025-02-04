@@ -103,6 +103,7 @@ def _linux_toolchains_extension(module_ctx):
                 architecture = architectures[0],
                 source = install.source,
                 fix_with_patchelf = install.fix_with_patchelf,
+                patchelf_dirs = install.patchelf_dirs + install.extra_patchelf_dirs,
                 build_file = install.build_file,
             )
 
@@ -255,6 +256,28 @@ install = tag_class(
         "fix_with_patchelf": attr.bool(
             doc = "Whether to fix the RPATH/interpreter of executables/libraries using `patchelf`",
             default = False,
+        ),
+        "patchelf_dirs": attr.string_list(
+            doc = """
+            Paths to inspect for executable/library files to fix with `patchelf`
+
+            Note that this will not recursively inspect subdirectories.
+            "{arch}" will be replaced by the value as returned by `uname -m`).
+            """,
+            default = [
+                "lib/{arch}-linux-gnu",
+                "usr/lib/{arch}-linux-gnu",
+                "usr/bin",
+            ],
+        ),
+        "extra_patchelf_dirs": attr.string_list(
+            doc = """
+            Additional paths to inspect for executable/library files to fix with `patchelf`
+
+            Note that this will not recursively inspect subdirectories.
+            "{arch}" will be replaced by the value as returned by `uname -m`).
+            """,
+            default = [],
         ),
         "build_file": attr.label(
             doc = "Experimental: BUILD.bazel template for the generated install dir.",

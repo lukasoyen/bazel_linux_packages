@@ -142,12 +142,8 @@ def _fixup_executables(rctx, busybox, patchelf):
 
     # We don't want to rpath patch the ld*.so
     seen = {interpreter: True}
-    for directory in [
-        "lib/{}-linux-gnu".format(arch),
-        "usr/lib/{}-linux-gnu".format(arch),
-        "usr/bin",
-    ]:
-        for path in _list_files(rctx, busybox, directory, "-maxdepth", "1"):
+    for directory in rctx.attr.patchelf_dirs:
+        for path in _list_files(rctx, busybox, directory.format(arch = arch), "-maxdepth", "1"):
             realpath = str(rctx.path(path).realpath).removeprefix(pwd)
             if realpath not in seen and not any([realpath.endswith(e) for e in (".o", ".a")]):
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
@@ -204,6 +200,7 @@ deb_install = repository_rule(
         "architecture": attr.string(mandatory = True),
         "source": attr.string(mandatory = True),
         "fix_with_patchelf": attr.bool(mandatory = True),
+        "patchelf_dirs": attr.string_list(mandatory = True),
         "build_file": attr.label(mandatory = True),
     },
 )
