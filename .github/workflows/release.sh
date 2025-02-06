@@ -23,7 +23,7 @@ bazel_dep(name = "linux_packages", version = "${TAG}")
 \`\`\`
 EOF
 
-tar xf "${PREFIX}.tar.zst"
+tar xvf "${PREFIX}.tar.zst"
 
 (
     pushd e2e/smoke
