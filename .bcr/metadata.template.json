@@ -1,7 +1,13 @@
 {
-  "homepage": "https://github.com/lukasoyen/linux_packages",
-  "maintainers": [],
-  "repository": ["github:lukasoyen/linux_packages"],
+  "homepage": "https://github.com/lukasoyen/bazel_linux_packages",
+  "maintainers": [
+    {
+      "name": "Lukas Oyen",
+      "email": "lummax@mailbox.org",
+      "github": "lukasoyen"
+    }
+  ],
+  "repository": ["github:lukasoyen/bazel_linux_packages"],
   "versions": [],
   "yanked_versions": {}
 }
