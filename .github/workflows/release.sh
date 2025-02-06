@@ -9,7 +9,7 @@ readonly PREFIX="$2"
 readonly RELEASE_NOTES="$3"
 
 # NB: configuration for 'git archive' is in /.gitattributes
-git archive --prefix="${PREFIX}-${TAG}/" ${TAG} -o "${PREFIX}-${TAG}.tar.zst"
+git archive --prefix="${PREFIX}/" ${TAG} -o "${PREFIX}.tar.zst"
 
 cat > "${RELEASE_NOTES}" << EOF
 ## Using Bzlmod with Bazel 8 or greater
@@ -21,10 +21,10 @@ bazel_dep(name = "linux_packages", version = "${TAG}")
 \`\`\`
 EOF
 
-tar xf "${PREFIX}-${TAG}.tar.zst"
+tar xf "${PREFIX}.tar.zst"
 
 (
     pushd e2e/smoke
-    bazel test "--override_module=linux_packages=../../${PREFIX}-${TAG}" //...
+    bazel test "--override_module=linux_packages=../../${PREFIX}" //...
     popd
 )
