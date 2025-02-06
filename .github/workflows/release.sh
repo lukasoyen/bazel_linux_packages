@@ -9,7 +9,9 @@ readonly PREFIX="$2"
 readonly RELEASE_NOTES="$3"
 
 # NB: configuration for 'git archive' is in /.gitattributes
-git archive --prefix="${PREFIX}/" ${TAG} -o "${PREFIX}.tar.zst"
+git archive --format=tar --prefix="${PREFIX}/" ${TAG} | zstd --compress -15 -f -q -o "${PREFIX}.tar.zst"
+
+ls -l "${PREFIX}.tar.zst"
 
 cat > "${RELEASE_NOTES}" << EOF
 ## Using with Bzlmod with Bazel 8 or greater
