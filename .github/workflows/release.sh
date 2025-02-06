@@ -12,7 +12,7 @@ readonly RELEASE_NOTES="$3"
 git archive --prefix="${PREFIX}/" ${TAG} -o "${PREFIX}.tar.zst"
 
 cat > "${RELEASE_NOTES}" << EOF
-## Using Bzlmod with Bazel 8 or greater
+## Using with Bzlmod with Bazel 8 or greater
 
 2. Add to your \`MODULE.bazel\` file:
 
