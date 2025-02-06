@@ -1,19 +1,21 @@
 name: CI
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [main]
+    tags: ["v*.*.*"]
   pull_request:
     branches: [main]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
 concurrency:
   # Cancel previous actions from the same PR or branch except 'main' branch.
   # See https://docs.github.com/en/actions/using-jobs/using-concurrency and https://docs.github.com/en/actions/learn-github-actions/contexts for more info.
   group: concurrency-group::${{ github.workflow }}::${{ github.event.pull_request.number > 0 && format('pr-{0}', github.event.pull_request.number) || github.ref_name }}${{ github.ref_name == 'main' && format('::{0}', github.run_id) || ''}}
   cancel-in-progress: ${{ github.ref_name != 'main' }}
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pre-commit/action@v3.0.1
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -44,24 +46,21 @@ jobs:
       - name: Test
         working-directory: ${{ matrix.folder }}
         run: bazel test //...
-  pre-commit:
+  release:
     runs-on: ubuntu-latest
+    needs: [test, pre-commit]
+    if: startsWith(github.ref, 'refs/tags/')
+    env:
+      prefix: bazel_linux_packages-${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pre-commit/action@v3.0.1
-  conclusion:
-    needs: [test, pre-commit]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - uses: technote-space/workflow-conclusion-action@45ce8e0eb155657ab8ccf346ade734257fd196a5 # v3.0.3
-      # Note: possible conclusion values:
-      # https://github.com/technote-space/workflow-conclusion-action/blob/main/src/constant.ts
-      - name: report success
-        if: ${{ env.WORKFLOW_CONCLUSION == 'success' }}
-        working-directory: /tmp
-        run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 0
-      - name: report failure
-        if: ${{ env.WORKFLOW_CONCLUSION == 'failure' }}
-        working-directory: /tmp
-        run: echo ${{ env.WORKFLOW_CONCLUSION }} && exit 1
+      - name: Build release artifacts and prepare release notes
+        run: ./github/release.sh ${{ github.ref_name }} ${{ env.prefix }} release_notes.txt
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          generate_release_notes: true
+          body_path: release_notes.txt
+          fail_on_unmatched_files: true
+          files: ${{ env.prefix }}.tar.zst
