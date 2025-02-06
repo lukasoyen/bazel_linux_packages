@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build release artifacts and prepare release notes
-        run: ./github/release.sh ${{ github.ref_name }} ${{ env.prefix }} release_notes.txt
+        run: ./.github/workflows/release.sh ${{ github.ref_name }} ${{ env.prefix }} release_notes.txt
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
