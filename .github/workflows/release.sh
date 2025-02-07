@@ -5,11 +5,11 @@ set -o errexit -o nounset -o pipefail
 # Arguments provided by workflow caller, see ci.yaml
 # step: Build release artifacts and prepare release notes
 readonly TAG="$1"
-readonly PREFIX="$2"
+readonly PREFIX="${2//[\/]/-}" # in case of a merge this contains merge/XX, so replace / with -
 readonly RELEASE_NOTES="$3"
 
 # NB: configuration for 'git archive' is in /.gitattributes
-git archive --format=tar --prefix="${PREFIX}/" ${TAG} | zstd --compress -15 -f -q -o "${PREFIX}.tar.zst"
+git archive --format=tar --prefix="${PREFIX}/" HEAD | zstd --compress -15 -f -q -o "${PREFIX}.tar.zst"
 
 ls -l "${PREFIX}.tar.zst"
 
