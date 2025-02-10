@@ -57,7 +57,7 @@ jobs:
         run: ./.github/workflows/release.sh "${{ github.ref_name }}" "${{ env.prefix }}" release_notes.txt
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           prerelease: true
           generate_release_notes: true
