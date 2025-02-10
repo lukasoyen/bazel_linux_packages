@@ -95,12 +95,16 @@ def _linux_toolchains_extension(module_ctx):
             if len(architectures) > 1:
                 fail("Please set a `architecture` attribute for {}".format(install.name))
 
+            if install.fix_relative_interpreter_with_patchelf and install.fix_absolute_interpreter_with_patchelf:
+                fail("Can not set both `fix_relative_interpreter_with_patchelf = True` and `fix_absolute_interpreter_with_patchelf = True` for {}".format(install.name))
+
             deb_install(
                 name = install.name,
                 architecture = architectures[0],
                 source = install.source,
                 fix_rpath_with_patchelf = install.fix_rpath_with_patchelf,
-                fix_interpreter_with_patchelf = install.fix_interpreter_with_patchelf,
+                fix_relative_interpreter_with_patchelf = install.fix_relative_interpreter_with_patchelf,
+                fix_absolute_interpreter_with_patchelf = install.fix_absolute_interpreter_with_patchelf,
                 patchelf_dirs = install.patchelf_dirs + install.extra_patchelf_dirs,
                 build_file = install.build_file,
             )
@@ -255,8 +259,25 @@ install = tag_class(
             doc = "Whether to fix the RPATH of executables/libraries using `patchelf`",
             default = False,
         ),
-        "fix_interpreter_with_patchelf": attr.bool(
-            doc = "Whether to fix the interpreter of executables using `patchelf`",
+        "fix_relative_interpreter_with_patchelf": attr.bool(
+            doc = """
+            Whether to fix the interpreter of executables using `patchelf`
+
+            Only has an effect if `fix_rpath_with_patchelf` is set to `True`.
+            Mutually exclusive with `fix_absolute_interpreter_with_patchelf`.
+            """,
+            default = False,
+        ),
+        "fix_absolute_interpreter_with_patchelf": attr.bool(
+            doc = """
+            Whether to absolutize the interpreter while fixing executables/libraries using `patchelf`
+
+            Only has an effect if `fix_rpath_with_patchelf` is set to `True`.
+            Mutually exclusive with `fix_relative_interpreter_with_patchelf`.
+
+            Note that this will destroy remote-executability and cache-reuse across different systems
+            if the path to the source/build directory is not exactly the same.
+            """,
             default = False,
         ),
         "patchelf_dirs": attr.string_list(

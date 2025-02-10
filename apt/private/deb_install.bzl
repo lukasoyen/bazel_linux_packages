@@ -113,7 +113,19 @@ def _fixup_interpreter(rctx, patchelf, path, interpreter):
             result.stderr,
         ))
 
-def _fixup_executables(rctx, busybox, patchelf, fix_interpreter):
+def _find_interpreter(rctx, busybox, arch):
+    candidates = _list_files(
+        rctx,
+        busybox,
+        "lib64/",
+        "-name",
+        "ld-linux-{}.so*".format(arch.replace("_", "-")),
+    )
+    for path in sorted(candidates, reverse = True):
+        return str(rctx.path(path).realpath)
+    return None
+
+def _fixup_executables(rctx, busybox, patchelf, fix_relative_interpreter, fix_absolute_interpreter):
     rctx.report_progress("Fixing executable and libraries")
     pwd = str(rctx.path(".").realpath) + "/"
     arch = rctx.execute([busybox, "uname", "-m"]).stdout.strip()
@@ -122,32 +134,25 @@ def _fixup_executables(rctx, busybox, patchelf, fix_interpreter):
     for path in sorted(_list_files(rctx, busybox, "etc/ld.so.conf.d/")):
         lib_paths.extend(_read_ld_so_conf(rctx, path))
 
-    interpreter = None
-    for path in sorted(
-        _list_files(
-            rctx,
-            busybox,
-            "lib64/",
-            "-name",
-            "ld-linux-{}.so*".format(arch.replace("_", "-")),
-        ),
-        reverse = True,
-    ):
-        interpreter = str(rctx.path(path).realpath).removeprefix(pwd)
+    seen = set()
 
-    interpreter_path = "./external/{}/{}".format(
-        rctx.attr.name,
-        interpreter,
-    )
+    interpreter_path = None
+    interpreter = _find_interpreter(rctx, busybox, arch)
+    if interpreter != None:
+        # We don't want to rpath patch the ld*.so
+        seen.add(interpreter.removeprefix(pwd))
 
-    # We don't want to rpath patch the ld*.so
-    seen = set([interpreter])
+        if fix_relative_interpreter:
+            interpreter_path = "./external/{}/{}".format(rctx.attr.name, interpreter.removeprefix(pwd))
+        if fix_absolute_interpreter:
+            interpreter_path = interpreter
+
     for directory in rctx.attr.patchelf_dirs:
         for path in _list_files(rctx, busybox, directory.format(arch = arch), "-maxdepth", "1"):
             realpath = str(rctx.path(path).realpath).removeprefix(pwd)
             if realpath not in seen and not any([realpath.endswith(e) for e in (".o", ".a")]):
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
-                if interpreter != None and fix_interpreter:
+                if interpreter_path != None:
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
                 seen.add(realpath)
 
@@ -172,7 +177,13 @@ def _deb_install_impl(rctx):
             manifest["{}".format(label.name)] = _list_for_manifest(rctx, busybox, path)
 
         if rctx.attr.fix_rpath_with_patchelf:
-            _fixup_executables(rctx, busybox, patchelf, rctx.attr.fix_interpreter_with_patchelf)
+            _fixup_executables(
+                rctx,
+                busybox,
+                patchelf,
+                rctx.attr.fix_relative_interpreter_with_patchelf,
+                rctx.attr.fix_absolute_interpreter_with_patchelf,
+            )
 
         rctx.file(
             "install_manifest.json",
@@ -199,7 +210,8 @@ deb_install = repository_rule(
         "architecture": attr.string(mandatory = True),
         "source": attr.string(mandatory = True),
         "fix_rpath_with_patchelf": attr.bool(mandatory = True),
-        "fix_interpreter_with_patchelf": attr.bool(mandatory = True),
+        "fix_relative_interpreter_with_patchelf": attr.bool(mandatory = True),
+        "fix_absolute_interpreter_with_patchelf": attr.bool(mandatory = True),
         "patchelf_dirs": attr.string_list(mandatory = True),
         "build_file": attr.label(mandatory = True),
     },
