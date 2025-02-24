@@ -67,7 +67,7 @@ def _deb_index_impl(rctx):
     rctx.file(
         "copy.sh",
         rctx.read(rctx.attr._copy_sh_tmpl).format(
-            repo_name = rctx.attr.apparent_name.removesuffix("_index"),
+            repo_name = rctx.original_name.removesuffix("_index"),
             lock_label = rctx.attr.lockfile or workspace_relative_path,
             workspace_relative_path = workspace_relative_path,
         ),
@@ -169,7 +169,7 @@ def _deb_download_impl(rctx):
     rctx.watch(rctx.attr.lockfile)
 
     lock_cmds = (
-        ["bazel run @{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.attr.apparent_name)]
+        ["bazel run @{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.original_name)]
     )
     if not rctx.path(rctx.attr.lockfile).exists:
         util.warning(
@@ -200,7 +200,6 @@ def _deb_download_impl(rctx):
 _deb_index = repository_rule(
     implementation = _deb_index_impl,
     attrs = {
-        "apparent_name": attr.string(mandatory = True),
         "sources": attr.string_list(mandatory = True),
         "architectures": attr.string_list(mandatory = True),
         "packages": attr.string_list(mandatory = True),
@@ -216,7 +215,6 @@ _deb_index = repository_rule(
 _deb_download = repository_rule(
     implementation = _deb_download_impl,
     attrs = {
-        "apparent_name": attr.string(mandatory = True),
         "lockfile": attr.label(mandatory = True),
         "input_hash": attr.string(mandatory = True),
         "install_names": attr.string_list(mandatory = True),
