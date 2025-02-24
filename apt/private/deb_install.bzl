@@ -141,7 +141,7 @@ def _fixup_executables(rctx, busybox, patchelf):
     )
 
     # We don't want to rpath patch the ld*.so
-    seen = {interpreter: True}
+    seen = set([interpreter])
     for directory in rctx.attr.patchelf_dirs:
         for path in _list_files(rctx, busybox, directory.format(arch = arch), "-maxdepth", "1"):
             realpath = str(rctx.path(path).realpath).removeprefix(pwd)
@@ -149,7 +149,7 @@ def _fixup_executables(rctx, busybox, patchelf):
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
                 if interpreter != None:
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
-                seen[realpath] = True
+                seen.add(realpath)
 
 def _deb_install_impl(rctx):
     busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")

@@ -81,7 +81,7 @@ def _resolve_all(state, name, version, arch, include_transitive = True):
     dependencies = []
 
     # state variables
-    already_recursed = {}
+    already_recursed = set()
     dependency_group = []
     stack = [(name, version, -1)]
 
@@ -124,7 +124,7 @@ def _resolve_all(state, name, version, arch, include_transitive = True):
 
         if i != 0:
             # Add it to the dependencies
-            already_recursed[key] = True
+            already_recursed.add(key)
             dependencies.append(package)
 
         deps = []

@@ -11,11 +11,11 @@ def _resolve(rctx, input_hash, resolver, architectures, packages, include_transi
     lockf = lockfile.empty(rctx, input_hash)
     for arch in architectures:
         rctx.report_progress("Resolving package constraints for {}".format(arch))
-        dep_constraint_set = {}
+        dep_constraint = set()
         for dep_constraint in packages:
-            if dep_constraint in dep_constraint_set:
+            if dep_constraint in dep_constraint:
                 fail("Duplicate package, {}. Please remove it from your packages".format(dep_constraint))
-            dep_constraint_set[dep_constraint] = True
+            dep_constraint.add(dep_constraint)
 
             constraint = version_constraint.parse_depends(dep_constraint).pop()
 
