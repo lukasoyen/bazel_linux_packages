@@ -32,7 +32,8 @@ apt.download(
 )
 apt.install(
     name = "clang_toolchain",
-    fix_with_patchelf = True,
+    fix_interpreter_with_patchelf = True,
+    fix_rpath_with_patchelf = True,
     source = "focal_clang",
 )
 use_repo(apt, "clang_toolchain")
@@ -55,7 +56,8 @@ apt.download(
 apt.install(
     name = "gcc_toolchain",
     extra_patchelf_dirs = ["usr/lib/gcc/x86_64-linux-gnu/12"],
-    fix_with_patchelf = True,
+    fix_interpreter_with_patchelf = True,
+    fix_rpath_with_patchelf = True,
     source = "bookworm_gcc",
 )
 use_repo(apt, "gcc_toolchain")

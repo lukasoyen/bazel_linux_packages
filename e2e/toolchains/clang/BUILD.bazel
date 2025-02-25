@@ -47,7 +47,7 @@ cc_toolchain(
     name = "cc_toolchain",
     args = [
         ":sysroot",
-        # This is the alternative to the `fix_with_patchelf=True` in `install()`
+        # This is the alternative to the `fix_rpath_with_patchelf=True` in `install()`
         #":ld_library_path",
         ":gold-linker",
         ":determinism",
