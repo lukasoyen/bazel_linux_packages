@@ -10,8 +10,12 @@ readonly RELEASE_NOTES="$3"
 
 # NB: configuration for 'git archive' is in /.gitattributes
 git archive --format=tar --prefix="${PREFIX}/" HEAD | zstd --compress -15 -f -q -o "${PREFIX}.tar.zst"
+git archive --format=tar --prefix="${PREFIX}/" HEAD | xz --compress -9 -q > "${PREFIX}.tar.xz"
 
 ls -l "${PREFIX}.tar.zst"
+tar tf "${PREFIX}.tar.zst"
+ls -l "${PREFIX}.tar.xz"
+tar tf "${PREFIX}.tar.xz"
 
 cat > "${RELEASE_NOTES}" << EOF
 ## Using with Bzlmod with Bazel 8 or greater
@@ -23,7 +27,7 @@ bazel_dep(name = "linux_packages", version = "${TAG}")
 \`\`\`
 EOF
 
-tar xvf "${PREFIX}.tar.zst"
+tar xf "${PREFIX}.tar.zst"
 
 (
     pushd e2e/smoke
