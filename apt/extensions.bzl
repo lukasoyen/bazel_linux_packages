@@ -99,7 +99,8 @@ def _linux_toolchains_extension(module_ctx):
                 name = install.name,
                 architecture = architectures[0],
                 source = install.source,
-                fix_with_patchelf = install.fix_with_patchelf,
+                fix_rpath_with_patchelf = install.fix_rpath_with_patchelf,
+                fix_interpreter_with_patchelf = install.fix_interpreter_with_patchelf,
                 patchelf_dirs = install.patchelf_dirs + install.extra_patchelf_dirs,
                 build_file = install.build_file,
             )
@@ -250,8 +251,12 @@ install = tag_class(
             doc = "download() repositories to unpack packages from",
             default = "download",
         ),
-        "fix_with_patchelf": attr.bool(
-            doc = "Whether to fix the RPATH/interpreter of executables/libraries using `patchelf`",
+        "fix_rpath_with_patchelf": attr.bool(
+            doc = "Whether to fix the RPATH of executables/libraries using `patchelf`",
+            default = False,
+        ),
+        "fix_interpreter_with_patchelf": attr.bool(
+            doc = "Whether to fix the interpreter of executables using `patchelf`",
             default = False,
         ),
         "patchelf_dirs": attr.string_list(

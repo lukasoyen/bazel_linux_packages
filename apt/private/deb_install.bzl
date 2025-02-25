@@ -113,7 +113,7 @@ def _fixup_interpreter(rctx, patchelf, path, interpreter):
             result.stderr,
         ))
 
-def _fixup_executables(rctx, busybox, patchelf):
+def _fixup_executables(rctx, busybox, patchelf, fix_interpreter):
     rctx.report_progress("Fixing executable and libraries")
     pwd = str(rctx.path(".").realpath) + "/"
     arch = rctx.execute([busybox, "uname", "-m"]).stdout.strip()
@@ -147,7 +147,7 @@ def _fixup_executables(rctx, busybox, patchelf):
             realpath = str(rctx.path(path).realpath).removeprefix(pwd)
             if realpath not in seen and not any([realpath.endswith(e) for e in (".o", ".a")]):
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
-                if interpreter != None:
+                if interpreter != None and fix_interpreter:
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
                 seen.add(realpath)
 
@@ -171,8 +171,8 @@ def _deb_install_impl(rctx):
             _extract_data_file(rctx, busybox, path)
             manifest["{}".format(label.name)] = _list_for_manifest(rctx, busybox, path)
 
-        if rctx.attr.fix_with_patchelf:
-            _fixup_executables(rctx, busybox, patchelf)
+        if rctx.attr.fix_rpath_with_patchelf:
+            _fixup_executables(rctx, busybox, patchelf, rctx.attr.fix_interpreter_with_patchelf)
 
         rctx.file(
             "install_manifest.json",
@@ -198,7 +198,8 @@ deb_install = repository_rule(
     attrs = {
         "architecture": attr.string(mandatory = True),
         "source": attr.string(mandatory = True),
-        "fix_with_patchelf": attr.bool(mandatory = True),
+        "fix_rpath_with_patchelf": attr.bool(mandatory = True),
+        "fix_interpreter_with_patchelf": attr.bool(mandatory = True),
         "patchelf_dirs": attr.string_list(mandatory = True),
         "build_file": attr.label(mandatory = True),
     },

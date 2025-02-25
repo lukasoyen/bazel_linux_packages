@@ -60,11 +60,12 @@ See [e2e/](e2e/README.md) for end to end tests and
   )
   ```
 
-  2. Set `fix_with_patchelf = True` for
+  2. Set `fix_rpath_with_patchelf = True` for
      [`apt.install()`](docs/extensions.md#install). This will use
-     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables and
-     binaries to add library search directories to `RUNPATH` and set the
-     interpreter binary (`ld.so`).
+     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables
+     and binaries to add library search directories to `RUNPATH`. You can use
+     `fix_interpreter_with_patchels = True` and to the interpreter binary
+     (`ld.so`).
 
 - If you manage to use the correct `glibc` version, it might be compiled against
   a newer Linux kernel and error out. Use `file path/to/your/binary` to check
