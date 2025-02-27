@@ -29,15 +29,15 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_archive(
     name = "patchelf_linux_amd64",
     build_file_content = "alias(name='patchelf', actual='bin/patchelf')",
-    integrity = "sha256-o/ucHeNRK8kfJ8xHKX1tbPIIre6bZO1xkTDaWawT4ms=",
-    urls = ["https://github.com/NixOS/patchelf/releases/download/0.17.2/patchelf-0.17.2-x86_64.tar.gz"],
+    integrity = "sha256-TcQP3TtrwQi3ublkHlTMN4K96kGZp8edkQb9YZKj6SY=",
+    urls = ["https://github.com/NixOS/patchelf/releases/download/0.16.1/patchelf-0.16.1-x86_64.tar.gz"],
 )
 
 http_archive(
     name = "patchelf_linux_arm64",
     build_file_content = "alias(name='patchelf', actual='bin/patchelf')",
-    integrity = "sha256-5RZetZKjF+H22grH/LzPYNf7jlrB8NczapvlHCMwiwY=",
-    urls = ["https://github.com/NixOS/patchelf/releases/download/0.17.2/patchelf-0.17.2-aarch64.tar.gz"],
+    integrity = "sha256-dDqoMkWeXJVzQQaVDEgm58Y37PJOnkJkRNnO6s92+Ws=",
+    urls = ["https://github.com/NixOS/patchelf/releases/download/0.16.1/patchelf-0.16.1-aarch64.tar.gz"],
 )
 
 bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
