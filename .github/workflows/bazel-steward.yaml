@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: VirtusLab/bazel-steward@v1.5.2
+      - uses: VirtusLab/bazel-steward@v1.6.0
         with:
           github-personal-token: ${{ secrets.STEWARD }}
           configuration-path: "./.github/bazel-steward.yaml"
