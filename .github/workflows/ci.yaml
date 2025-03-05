@@ -64,5 +64,5 @@ jobs:
           body_path: release_notes.txt
           fail_on_unmatched_files: true
           files: |
-            "${{ env.prefix }}.tar.zst"
-            "${{ env.prefix }}.tar.xz"
+            ${{ env.prefix }}.tar.zst
+            ${{ env.prefix }}.tar.xz
