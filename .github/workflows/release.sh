@@ -30,7 +30,7 @@ EOF
 tar xf "${PREFIX}.tar.zst"
 
 (
-    pushd e2e/smoke
-    bazel test "--override_module=linux_packages=../../${PREFIX}" //...
+    pushd "${PREFIX}/e2e/smoke"
+    bazel test "--override_module=linux_packages=." //...
     popd
 )
