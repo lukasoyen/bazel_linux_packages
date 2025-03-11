@@ -18,9 +18,9 @@ ls -l "${PREFIX}.tar.xz"
 tar tf "${PREFIX}.tar.xz"
 
 cat > "${RELEASE_NOTES}" << EOF
-## Using with Bzlmod with Bazel 8 or greater
+## Using with Bazel 8.1 or greater
 
-2. Add to your \`MODULE.bazel\` file:
+Add to your \`MODULE.bazel\` file:
 
 \`\`\`starlark
 bazel_dep(name = "linux_packages", version = "${TAG}")
