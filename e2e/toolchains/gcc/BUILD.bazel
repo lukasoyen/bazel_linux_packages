@@ -1,6 +1,5 @@
 load("@gcc_toolchain//:defs.bzl", "with_repository_prefix")
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
-load("@rules_cc//cc/toolchains:args_list.bzl", "cc_args_list")
 load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
 load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
 
@@ -10,27 +9,7 @@ cc_sysroot(
 )
 
 cc_args(
-    name = "inject_gcc",
-    actions = ["@rules_cc//cc/toolchains/actions:c_compile"],
-    args = ["x86_64-linux-gnu-gcc-12"],
-)
-
-cc_args(
-    name = "inject_g++",
-    actions = ["@rules_cc//cc/toolchains/actions:cpp_compile"],
-    args = ["x86_64-linux-gnu-g++-12"],
-)
-
-cc_args_list(
-    name = "inject_compiler",
-    args = [
-        ":inject_gcc",
-        ":inject_g++",
-    ],
-)
-
-cc_args(
-    name = "exec_prefix",
+    name = "environment",
     actions = ["@rules_cc//cc/toolchains/actions:all_actions"],
     env = {
         "GCC_EXEC_PREFIX": with_repository_prefix("usr/lib/gcc/"),
@@ -76,12 +55,8 @@ cc_args(
 cc_toolchain(
     name = "cc_toolchain",
     args = [
-        # The targets `gcc_file`, `inject_gcc`, `g++_file`, `inject_g++`, and `inject_compile`
-        # should not be necessary if the Ubuntu/Debian compiler would behave correctly.
-        # See comment in `wrapper.sh`.
-        ":inject_compiler",
         ":sysroot",
-        ":exec_prefix",
+        ":environment",
         ":determinism",
         ":gold-linker",
         ":no_canonical_prefixes",
