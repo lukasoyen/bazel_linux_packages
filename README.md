@@ -45,31 +45,30 @@ See [e2e/](e2e/README.md) for end to end tests and
   incompatibilities can result in errors. The created repository will contain
   the correct `glibc` version. There are two strategies to handle these:
 
-  1. The systems' loader will be used to load required libraries and will search
+  1. Set [`fix_rpath_with_patchelf = True`](docs/extensions.md#apt.install-fix_rpath_with_patchelf) for
+     [`apt.install()`](docs/extensions.md#install). This will use
+     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables
+     and binaries to add library search directories to `RUNPATH`. See also
+     `fix_absolute_interpreter_with_patchelf`,
+     `fix_relative_interpreter_with_patchelf`, and `extra_patchelf_dirs`.
+  2. The systems' loader will be used to load required libraries and will search
      system-wide. `LD_LIBRARY_PATH` can be used to set directories to search.
      `LD_DEBUG` can be used to debug missing library issues. The generated
      repository exposes `with_repository_prefix()` that returns the `exec`-root
      relative path to it. It can be used like:
 
-  ```py
-  load("@my_repository//:defs.bzl", "with_repository_prefix")
+     ```py
+     load("@my_repository//:defs.bzl", "with_repository_prefix")
 
-  my_rule(
-      [...]
-      env = {"LD_LIBRARY_PATH": with_repository_prefix("usr/lib/x86_64-linux-gnu")},
-  )
-  ```
+     my_rule(
+         [...]
+         env = {"LD_LIBRARY_PATH": with_repository_prefix("usr/lib/x86_64-linux-gnu")},
+     )
+     ```
 
-  2. Set `fix_rpath_with_patchelf = True` for
-     [`apt.install()`](docs/extensions.md#install). This will use
-     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables
-     and binaries to add library search directories to `RUNPATH`. You can use
-     `fix_interpreter_with_patchels = True` and to the interpreter binary
-     (`ld.so`).
-
-- If you manage to use the correct `glibc` version, it might be compiled against
-  a newer Linux kernel and error out. Use `file path/to/your/binary` to check
-  which kernel version is the minimum required.
+- The `glibc` version from the extracted packages might be compiled against
+  a newer Linux kernel than you are running and error out. Use
+  `file path/to/your/binary` to check which kernel version is the minimum required.
 
 ## Related
 
