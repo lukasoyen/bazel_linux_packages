@@ -1,7 +1,7 @@
 "Bazel dependencies"
 
 module(
-    name = "linux_packages",
+    name = "bazel_linux_packages",
     version = "0.0.0",
     bazel_compatibility = [">=8.1.0"],
     compatibility_level = 1,
