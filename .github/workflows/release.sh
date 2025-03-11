@@ -23,7 +23,7 @@ cat > "${RELEASE_NOTES}" << EOF
 Add to your \`MODULE.bazel\` file:
 
 \`\`\`starlark
-bazel_dep(name = "linux_packages", version = "${TAG}")
+bazel_dep(name = "bazel_linux_packages", version = "${TAG}")
 \`\`\`
 EOF
 
@@ -31,6 +31,6 @@ tar xf "${PREFIX}.tar.zst"
 
 (
     pushd "${PREFIX}/e2e/smoke"
-    bazel test "--override_module=linux_packages=." //...
+    bazel test "--override_module=bazel_linux_packages=." //...
     popd
 )
