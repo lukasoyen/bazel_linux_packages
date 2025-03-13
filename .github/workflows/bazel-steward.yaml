@@ -15,5 +15,5 @@ jobs:
       - uses: VirtusLab/bazel-steward@v1.7.0
         with:
           github-personal-token: ${{ secrets.STEWARD }}
-          configuration-path: "./.github/bazel-steward.yaml"
+          configuration-path: ./.github/bazel-steward.yaml
           additional-args: "${{ matrix.dir }}"
