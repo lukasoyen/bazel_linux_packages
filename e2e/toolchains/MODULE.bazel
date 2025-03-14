@@ -55,6 +55,10 @@ apt.download(
 )
 apt.install(
     name = "gcc_toolchain",
+    add_files = {
+        "usr/bin/x86_64-linux-gnu-g++-12.wrapped": "//gcc/tools:wrapper.sh",
+        "usr/bin/x86_64-linux-gnu-gcc-12.wrapped": "//gcc/tools:wrapper.sh",
+    },
     extra_patchelf_dirs = ["usr/lib/gcc/x86_64-linux-gnu/12"],
     fix_relative_interpreter_with_patchelf = True,
     fix_rpath_with_patchelf = True,
