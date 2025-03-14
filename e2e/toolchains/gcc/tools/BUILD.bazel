@@ -1,15 +1,7 @@
 load("@rules_cc//cc/toolchains:tool.bzl", "cc_tool")
 load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
 
-sh_binary(
-    name = "x86_64-linux-gnu-g++-12",
-    srcs = ["wrapper.sh"],
-)
-
-sh_binary(
-    name = "x86_64-linux-gnu-gcc-12",
-    srcs = ["wrapper.sh"],
-)
+exports_files(["wrapper.sh"])
 
 cc_tool(
     name = "ar",
@@ -19,19 +11,19 @@ cc_tool(
 
 cc_tool(
     name = "asm",
-    src = ":x86_64-linux-gnu-gcc-12",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
     data = ["@gcc_toolchain//:files"],
 )
 
 cc_tool(
     name = "g++",
-    src = ":x86_64-linux-gnu-g++-12",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
     data = ["@gcc_toolchain//:files"],
 )
 
 cc_tool(
     name = "gcc",
-    src = ":x86_64-linux-gnu-gcc-12",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
     capabilities = [
         "@rules_cc//cc/toolchains/capabilities:supports_start_end_lib",
         "@rules_cc//cc/toolchains/capabilities:supports_dynamic_linker",
@@ -42,7 +34,7 @@ cc_tool(
 
 cc_tool(
     name = "ld",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12",
+    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
     data = ["@gcc_toolchain//:files"],
 )
 

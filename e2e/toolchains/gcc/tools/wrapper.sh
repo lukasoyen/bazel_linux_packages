@@ -17,6 +17,7 @@ function relativize_dotd() {
 
 trap 'relativize_dotd "$@"' EXIT
 
-GCC_EXEC_PREFIX="$(dirname "$(which "$(basename "$0")")")/../../usr/lib/gcc/" \
-    "$(basename "$0")" "$@"
+PATH="$(dirname "$0"):$PATH" \
+GCC_EXEC_PREFIX="$(dirname "$0")/../../usr/lib/gcc/" \
+    "${0%.wrapped}" "$@"
 exit $?
