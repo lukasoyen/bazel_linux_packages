@@ -45,7 +45,9 @@ jobs:
           bazel version
       - name: Test
         working-directory: ${{ matrix.folder }}
-        run: bazel test //...
+        run: |
+          ldd --version
+          bazel test //...
   package:
     runs-on: ubuntu-latest
     needs: [test, pre-commit]
