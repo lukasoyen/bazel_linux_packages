@@ -106,6 +106,7 @@ def _linux_toolchains_extension(module_ctx):
                 fix_relative_interpreter_with_patchelf = install.fix_relative_interpreter_with_patchelf,
                 fix_absolute_interpreter_with_patchelf = install.fix_absolute_interpreter_with_patchelf,
                 patchelf_dirs = install.patchelf_dirs + install.extra_patchelf_dirs,
+                add_files = install.add_files,
                 build_file = install.build_file,
             )
 
@@ -301,6 +302,16 @@ install = tag_class(
             "{arch}" will be replaced by the value as returned by `uname -m`).
             """,
             default = [],
+        ),
+        "add_files": attr.string_keyed_label_dict(
+            doc = """
+            Experimental: add files to the install dir.
+
+            The keys are paths into the install dir. The label may
+            only refer to a single file.
+            """,
+            allow_files = True,
+            default = {},
         ),
         "build_file": attr.label(
             doc = "Experimental: BUILD.bazel template for the generated install dir.",
