@@ -28,11 +28,23 @@ def _input_data(tag):
         values[attr] = getattr(tag, attr)
     return json.encode(values)
 
+INTEGRITY = {
+    "https://snapshot.debian.org/archive/debian/20250201T023325Z/dists/bookworm/main/binary-amd64/Packages.xz": "sha256-Fl6W8bB5Dzn+0u4C6nYCJcZD8qjRx4Y220YpESAG7Ws=",
+    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/main/binary-amd64/Packages.xz": "sha256-d1eSH/j+7Zw5NKDJk21EG6SiOL7j6myMHfXLzUP8mGE=",
+    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/main/binary-arm64/Packages.xz": "sha256-4BSyQQIdjAzxbLlPRPTK+3dGUHdpuvNrd4RdOuIuLBs=",
+    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/universe/binary-amd64/Packages.xz": "sha256-RqdG2seJvZU3rKVNsWgLnf9RwkgVMRE1A4IZnX2WudE=",
+}
+
 def _apt_extension(module_ctx):
     root_direct_deps = []
     root_direct_dev_deps = []
 
+    integrity = dict(INTEGRITY)
+
     for mod in module_ctx.modules:
+        for cfg in mod.tags.index_integrity:
+            integrity.update(cfg.integrities)
+
         for tag in ("download", "ubuntu", "debian"):
             for cfg in getattr(mod.tags, tag):
                 if cfg.fix_relative_interpreter_with_patchelf and cfg.fix_absolute_interpreter_with_patchelf:
@@ -42,6 +54,7 @@ def _apt_extension(module_ctx):
 
                 deb_repository.fetch(
                     name = cfg.name + "_repository",
+                    integrity = integrity,
                     suites = cfg.suites,
                     architectures = cfg.architectures,
                     components = cfg.components,
@@ -92,6 +105,7 @@ def _apt_extension(module_ctx):
                             root_direct_deps.append(name)
 
     return module_ctx.extension_metadata(
+        reproducible = True,
         root_module_direct_deps = root_direct_deps,
         root_module_direct_dev_deps = root_direct_dev_deps,
     )
@@ -235,6 +249,18 @@ retrieved package index files to be able to re-generate the same lockfiles.
 Multiple `{tag}()` tags are allowed but need unique names.
 """
 
+index_integrity = tag_class(
+    doc = """
+    Optional tag to extend the list of integrity hashes for the package index URLs.
+    """,
+    attrs = {
+        "integrities": attr.string_dict(
+            doc = "URL -> integrity mapping for the package index URLs",
+            mandatory = True,
+        ),
+    },
+)
+
 download = tag_class(
     doc = DOC.format(tag = "download"),
     attrs = ATTR | {
@@ -266,6 +292,7 @@ debian = tag_class(
 apt = module_extension(
     implementation = _apt_extension,
     tag_classes = {
+        "index_integrity": index_integrity,
         "download": download,
         "ubuntu": ubuntu,
         "debian": debian,

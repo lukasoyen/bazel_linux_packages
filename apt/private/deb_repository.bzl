@@ -21,20 +21,22 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
 
     failed_attempts = []
 
+    updated_integrity = {}
+
     for (ext, cmd) in supported_extensions.items():
         output = "{}/Packages{}".format(target_triple, ext)
         dist_url = "{}/dists/{}/{}/binary-{}/Packages{}".format(url, dist, comp, arch, ext)
         download = rctx.download(
             url = dist_url,
             output = output,
-            integrity = integrity,
+            integrity = integrity.get(dist_url, ""),
             allow_fail = True,
         )
         decompress_r = None
         if download.success:
             decompress_r = rctx.execute(cmd + [output])
             if decompress_r.return_code == 0:
-                integrity = download.integrity
+                updated_integrity[dist_url] = download.integrity
                 break
 
         failed_attempts.append((dist_url, download, decompress_r))
@@ -56,7 +58,7 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
 {}
         """.format(len(failed_attempts), "\n".join(attempt_messages)))
 
-    return ("{}/Packages".format(target_triple), integrity)
+    return ("{}/Packages".format(target_triple), updated_integrity)
 
 def _parse_repository(state, contents, root):
     last_key = ""
@@ -160,8 +162,25 @@ def _create(mctx, index):
         package = lambda **kwargs: _package(state, **kwargs),
     )
 
+def _new_integrities(integrities, updates):
+    result = dict()
+    for (url, integrity) in updates.items():
+        if url not in integrities:
+            result[url] = integrity
+    return result
+
+INTEGRITY_ERROR = """
+Please add the following to your `MODULE.bazel` to make downloading the
+package indices reproducible.
+
+apt.index_integrity(
+    integrities = {integrities}
+)
+"""
+
 def _fetch_impl(rctx):
     package_files = dict()
+    integrity = {}
     for dist in rctx.attr.suites:
         for arch in rctx.attr.architectures:
             for comp in rctx.attr.components:
@@ -173,8 +192,20 @@ def _fetch_impl(rctx):
                 uri = rctx.attr.uri.rstrip("/")
 
                 rctx.report_progress("Fetching package index: {}/{} for {}".format(dist, comp, arch))
-                (output, _) = _fetch_package_index(rctx, uri, dist, comp, arch, "")
+                (output, updates) = _fetch_package_index(rctx, uri, dist, comp, arch, rctx.attr.integrity)
+                integrity.update(updates)
                 package_files["@@{}//:{}".format(rctx.name, output)] = uri
+
+    updated_integrity = _new_integrities(rctx.attr.integrity, integrity)
+    if updated_integrity:
+        msg = INTEGRITY_ERROR.format(
+            integrities = json.encode_indent(
+                updated_integrity,
+                prefix = " " * 4,
+                indent = " " * 4,
+            ),
+        )
+        fail(msg)
 
     rctx.file(
         "index.json",
@@ -186,14 +217,17 @@ def _fetch_impl(rctx):
         executable = False,
     )
 
+FETCH_ATTR = {
+    "suites": attr.string_list(mandatory = True),
+    "integrity": attr.string_dict(mandatory = True),
+    "architectures": attr.string_list(mandatory = True),
+    "components": attr.string_list(mandatory = True),
+    "uri": attr.string(mandatory = True),
+}
+
 _fetch = repository_rule(
     implementation = _fetch_impl,
-    attrs = {
-        "suites": attr.string_list(mandatory = True),
-        "architectures": attr.string_list(mandatory = True),
-        "components": attr.string_list(mandatory = True),
-        "uri": attr.string(mandatory = True),
-    },
+    attrs = FETCH_ATTR,
 )
 
 deb_repository = struct(
