@@ -193,7 +193,7 @@ def _deb_download_impl(rctx):
     )
     rctx.file(
         "BUILD.bazel",
-        _BUILD_TMPL.format(rctx.attr.name),
+        _BUILD_TMPL.format(rctx.attr.name.removesuffix("_" + rctx.attr.architecture + "_download")),
         executable = False,
     )
 
@@ -216,6 +216,7 @@ _deb_download = repository_rule(
     implementation = _deb_download_impl,
     attrs = {
         "lockfile": attr.label(mandatory = True),
+        "architecture": attr.string(mandatory = True),
         "input_hash": attr.string(mandatory = True),
         "install_names": attr.string_list(mandatory = True),
     },

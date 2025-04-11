@@ -13,23 +13,19 @@ apt = use_extension(
     "apt",
     dev_dependency = True,
 )
-apt.source(
-    architectures = ["amd64"],
+apt.ubuntu(
+    name = "gcc_sysroot",
     components = [
         "main",
         "universe",
     ],
-    suites = ["focal"],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
-)
-apt.download(
     lockfile = "//:focal.lock.json",
     packages = [
         "binutils",
         "libstdc++-10-dev",
     ],
+    suites = ["focal"],
 )
-apt.install(name = "gcc_sysroot")
 use_repo(apt, "gcc_sysroot")
 
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")

@@ -12,33 +12,14 @@ apt = use_extension(
     "apt",
     dev_dependency = True,
 )
-apt.source(
+apt.ubuntu(
+    name = "busybox",
     architectures = [
         "amd64",
         "arm64",
     ],
-    components = ["main"],
+    lockfile = "//:focal.lock.json",
+    packages = ["busybox"],
     suites = ["focal"],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
-)
-apt.download(
-    name = "download_busybox_amd64",
-    architectures = ["amd64"],
-    lockfile = "//:focal_amd64.lock.json",
-    packages = ["busybox"],
-)
-apt.install(
-    name = "busybox_amd64",
-    source = "download_busybox_amd64",
-)
-apt.download(
-    name = "download_busybox_arm64",
-    architectures = ["arm64"],
-    lockfile = "//:focal_arm64.lock.json",
-    packages = ["busybox"],
-)
-apt.install(
-    name = "busybox_arm64",
-    source = "download_busybox_arm64",
 )
 use_repo(apt, "busybox_amd64", "busybox_arm64")

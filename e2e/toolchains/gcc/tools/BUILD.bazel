@@ -5,49 +5,49 @@ exports_files(["wrapper.sh"])
 
 cc_tool(
     name = "ar",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-ar",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-ar",
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "asm",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "g++",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "gcc",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-gcc-12.wrapped",
     capabilities = [
         "@rules_cc//cc/toolchains/capabilities:supports_start_end_lib",
         "@rules_cc//cc/toolchains/capabilities:supports_dynamic_linker",
         "@rules_cc//cc/toolchains/capabilities:supports_pic",
     ],
-    data = ["@gcc_toolchain//:files"],
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "ld",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-g++-12.wrapped",
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "objcopy",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-objcopy",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-objcopy",
+    data = ["@gcc//:files"],
 )
 
 cc_tool(
     name = "strip",
-    src = "@gcc_toolchain//:usr/bin/x86_64-linux-gnu-strip",
-    data = ["@gcc_toolchain//:files"],
+    src = "@gcc//:usr/bin/x86_64-linux-gnu-strip",
+    data = ["@gcc//:files"],
 )
 
 cc_tool_map(
