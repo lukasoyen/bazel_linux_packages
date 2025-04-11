@@ -24,6 +24,7 @@ use_repo(apt, "busybox")
 
 <pre>
 apt = use_extension("@bazel_linux_packages//apt:extensions.bzl", "apt")
+apt.index_integrity(<a href="#apt.index_integrity-integrities">integrities</a>)
 apt.download(<a href="#apt.download-name">name</a>, <a href="#apt.download-add_files">add_files</a>, <a href="#apt.download-architectures">architectures</a>, <a href="#apt.download-build_file">build_file</a>, <a href="#apt.download-components">components</a>, <a href="#apt.download-extra_patchelf_dirs">extra_patchelf_dirs</a>,
              <a href="#apt.download-fix_absolute_interpreter_with_patchelf">fix_absolute_interpreter_with_patchelf</a>, <a href="#apt.download-fix_relative_interpreter_with_patchelf">fix_relative_interpreter_with_patchelf</a>,
              <a href="#apt.download-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.download-lockfile">lockfile</a>, <a href="#apt.download-packages">packages</a>, <a href="#apt.download-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.download-resolve_transitive">resolve_transitive</a>, <a href="#apt.download-suites">suites</a>,
@@ -40,6 +41,18 @@ apt.debian(<a href="#apt.debian-name">name</a>, <a href="#apt.debian-add_files">
 
 
 **TAG CLASSES**
+
+<a id="apt.index_integrity"></a>
+
+### index_integrity
+
+Optional tag to extend the list of integrity hashes for the package index URLs.
+
+**Attributes**
+
+| Name  | Description | Type | Mandatory | Default |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="apt.index_integrity-integrities"></a>integrities |  URL -> integrity mapping for the package index URLs   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | required |  |
 
 <a id="apt.download"></a>
 
