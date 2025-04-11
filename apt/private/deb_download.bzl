@@ -95,7 +95,7 @@ def _deb_index_impl(rctx):
 _BUILD_TMPL = """
 alias(
     name="lock",
-    actual="@@{}_index//:lock",
+    actual="@{}//:lock",
     visibility = ["//visibility:public"]
 )
 """
@@ -166,20 +166,18 @@ def _deb_download_impl(rctx):
     # Ensure the repository gets restarted once the lockfile exists.
     rctx.watch(rctx.attr.lockfile)
 
-    lock_cmds = (
-        ["bazel run @{}//:lock".format(n) for n in rctx.attr.install_names] if rctx.attr.install_names else ["@{}//:lock".format(rctx.original_name)]
-    )
+    lock_cmd = "bazel run @{}//:lock".format(rctx.attr.install_name)
     if not rctx.path(rctx.attr.lockfile).exists:
         util.warning(
             rctx,
-            "\n".join(["Lockfiles need to be created. Please run:"] + lock_cmds),
+            "Lockfiles need to be created. Please run:\n" + lock_cmd,
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
         if lockf.input_hash() != rctx.attr.input_hash:
             util.warning(
                 rctx,
-                "\n".join(["Lockfiles need to be recreated. Please run:"] + lock_cmds),
+                "Lockfiles need to be recreated. Please run:\n" + lock_cmd,
             )
         else:
             data_files = _extract_packages(rctx, lockf)
@@ -191,7 +189,7 @@ def _deb_download_impl(rctx):
     )
     rctx.file(
         "BUILD.bazel",
-        _BUILD_TMPL.format(rctx.attr.name.removesuffix("_" + rctx.attr.architecture + "_download")),
+        _BUILD_TMPL.format(rctx.attr.index),
         executable = False,
     )
 
@@ -214,9 +212,10 @@ _deb_download = repository_rule(
     implementation = _deb_download_impl,
     attrs = {
         "lockfile": attr.label(mandatory = True),
+        "index": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
         "input_hash": attr.string(mandatory = True),
-        "install_names": attr.string_list(mandatory = True),
+        "install_name": attr.string(mandatory = True),
     },
 )
 

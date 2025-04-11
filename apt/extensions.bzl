@@ -66,10 +66,11 @@ def _apt_extension(module_ctx):
 
                     deb_download.download(
                         name = name + "_download",
+                        index = cfg.name + "_index",
                         architecture = arch,
                         lockfile = cfg.lockfile,
                         input_hash = input_hash,
-                        install_names = [name],
+                        install_name = name,
                     )
 
                     deb_install(
