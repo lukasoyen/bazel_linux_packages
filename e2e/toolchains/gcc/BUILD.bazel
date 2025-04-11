@@ -4,7 +4,7 @@ load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
 
 cc_sysroot(
     name = "sysroot",
-    sysroot = "@gcc_toolchain//:root",
+    sysroot = "@gcc//:root",
 )
 
 cc_args(

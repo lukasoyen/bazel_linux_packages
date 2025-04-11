@@ -15,10 +15,10 @@ Instead of using
 [testing the sysroot](../llvm_toolchain/README.md), this test sets up a
 `clang-10` compiler toolchain from Ubuntu packages.
 
-Recreate the lockfile with: `bazel run @clang_toolchain//:lock`
+Recreate the lockfile with: `bazel run @clang//:lock`
 
 ## `gcc` toolchain test
 
 This test sets up a `gcc` compiler toolchain from Debian packages.
 
-Recreate the lockfile with: `bazel run @gcc_toolchain//:lock`
+Recreate the lockfile with: `bazel run @gcc//:lock`

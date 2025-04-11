@@ -5,4 +5,4 @@ without dependencies.
 
 Checks the general API and functionality.
 
-Recreate the lockfile with: `bazel run @busybox//:lock`
+Recreate the lockfile with: `bazel run @busybox_amd64//:lock`

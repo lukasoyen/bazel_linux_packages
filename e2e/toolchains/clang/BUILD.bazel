@@ -1,11 +1,11 @@
-load("@clang_toolchain//:defs.bzl", "with_repository_prefix")
+load("@clang//:defs.bzl", "with_repository_prefix")
 load("@rules_cc//cc/toolchains:args.bzl", "cc_args")
 load("@rules_cc//cc/toolchains:toolchain.bzl", "cc_toolchain")
 load("@rules_cc//cc/toolchains/args:sysroot.bzl", "cc_sysroot")
 
 cc_sysroot(
     name = "sysroot",
-    sysroot = "@clang_toolchain//:root",
+    sysroot = "@clang//:root",
 )
 
 cc_args(

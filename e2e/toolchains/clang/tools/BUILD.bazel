@@ -3,44 +3,44 @@ load("@rules_cc//cc/toolchains:tool_map.bzl", "cc_tool_map")
 
 cc_tool(
     name = "ar",
-    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-ar",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/x86_64-linux-gnu-ar",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "asm",
-    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-as",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/x86_64-linux-gnu-as",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "clang++",
-    src = "@clang_toolchain//:usr/bin/clang++-10",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/clang++-10",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "clang",
-    src = "@clang_toolchain//:usr/bin/clang-10",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/clang-10",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "ld",
-    src = "@clang_toolchain//:usr/bin/clang++-10",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/clang++-10",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "objcopy",
-    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-objcopy",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/x86_64-linux-gnu-objcopy",
+    data = ["@clang//:files"],
 )
 
 cc_tool(
     name = "strip",
-    src = "@clang_toolchain//:usr/bin/x86_64-linux-gnu-strip",
-    data = ["@clang_toolchain//:files"],
+    src = "@clang//:usr/bin/x86_64-linux-gnu-strip",
+    data = ["@clang//:files"],
 )
 
 cc_tool_map(

@@ -16,26 +16,21 @@ Place the following in your `MODULE.bazel`. Then:
 
 ```py
 apt = use_extension("@bazel_linux_packages//apt:extensions.bzl", "apt")
-apt.source(
-    architectures = ["amd64"],
-    components = ["main"],
-    suites = ["focal"],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
-)
-apt.download(
+apt.ubuntu(
+    name = "busybox",
     lockfile = "//:focal.lock.json",
     packages = ["busybox"],
+    suites = ["focal"],
 )
-apt.install(name = "busybox")
 use_repo(apt, "busybox")
 ```
 
 See [e2e/](e2e/README.md) for end to end tests and
 [the extension docs](docs/extensions.md) for more details:
 
-- [`apt.source()`](docs/extensions.md#source)
 - [`apt.download()`](docs/extensions.md#download)
-- [`apt.install()`](docs/extensions.md#install)
+- [`apt.ubuntu()`](docs/extensions.md#ubuntu)
+- [`apt.debian()`](docs/extensions.md#debian)
 
 ## Handle Library Paths
 
@@ -46,7 +41,7 @@ See [e2e/](e2e/README.md) for end to end tests and
   the correct `glibc` version. There are two strategies to handle these:
 
   1. Set [`fix_rpath_with_patchelf = True`](docs/extensions.md#apt.install-fix_rpath_with_patchelf) for
-     [`apt.install()`](docs/extensions.md#install). This will use
+     [`apt.download()`](docs/extensions.md#download). This will use
      [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables
      and binaries to add library search directories to `RUNPATH`. See also
      `fix_absolute_interpreter_with_patchelf`,

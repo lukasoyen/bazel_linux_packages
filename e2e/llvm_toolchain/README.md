@@ -7,4 +7,4 @@ default configuration.
 This e2e test downloads `gcc-10` as a sysroot and configures `toolchains_llvm`
 to use it. Note that the `gcc-10` binary downloaded with this is not used at all.
 
-Recreate the lockfile with: `bazel run @gcc_sysroot//:lock`
+Recreate the lockfile with: `bazel run @gcc_sysroot_amd64//:lock`
