@@ -164,7 +164,7 @@ def _deb_install_impl(rctx):
     if index:
         if rctx.attr.architecture not in index:
             fail(
-                "Misconfigured `sysroot()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
+                "Misconfigured `install()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
             )
 
         arch = rctx.execute([busybox, "uname", "-m"]).stdout.strip()
