@@ -137,6 +137,9 @@ def _extract_packages(rctx, lockf):
 
     package_folder = "packages"
     for (package) in lockf.packages():
+        if package["arch"] != rctx.attr.architecture:
+            continue
+
         package_key = lockfile.make_package_key(
             package["name"],
             package["version"],
