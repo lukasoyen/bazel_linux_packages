@@ -1,5 +1,20 @@
 {
-	"input_hash": "inputs-1400810587",
+	"input_data": {
+		"architectures": [
+			"amd64"
+		],
+		"components": [
+			"main",
+			"universe"
+		],
+		"packages": [
+			"clang-10"
+		],
+		"suites": [
+			"focal"
+		],
+		"uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+	},
 	"packages": [
 		{
 			"arch": "amd64",

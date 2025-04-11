@@ -7,8 +7,8 @@ load("//apt/private:lockfile.bzl", "lockfile")
 load("//apt/private:util.bzl", "util")
 load("//apt/private:version_constraint.bzl", "version_constraint")
 
-def _resolve(rctx, input_hash, resolver, architectures, packages, include_transitive):
-    lockf = lockfile.empty(rctx, input_hash)
+def _resolve(rctx, input_data, resolver, architectures, packages, include_transitive):
+    lockf = lockfile.empty(rctx, input_data)
     for arch in architectures:
         rctx.report_progress("Resolving package constraints for {}".format(arch))
         dep_constraint_set = set()
@@ -78,7 +78,7 @@ def _deb_index_impl(rctx):
 
     lockf = _resolve(
         rctx,
-        rctx.attr.input_hash,
+        json.decode(rctx.attr.input_data),
         resolver,
         rctx.attr.architectures,
         rctx.attr.packages,
@@ -177,7 +177,7 @@ def _deb_download_impl(rctx):
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
-        if lockf.input_hash() != rctx.attr.input_hash:
+        if lockf.input_data() != json.decode(rctx.attr.input_data):
             util.warning(
                 rctx,
                 "Lockfiles need to be recreated. Please run:\n" + lock_cmd,
@@ -204,7 +204,7 @@ _deb_index = repository_rule(
         "packages": attr.string_list(mandatory = True),
         "lockfile": attr.label(mandatory = True),
         "resolve_transitive": attr.bool(default = True),
-        "input_hash": attr.string(mandatory = True),
+        "input_data": attr.string(mandatory = True),
         "_copy_sh_tmpl": attr.label(
             default = "//apt/private:copy.sh.tmpl",
             doc = "INTERNAL, DO NOT USE",
@@ -217,7 +217,7 @@ _deb_download = repository_rule(
         "lockfile": attr.label(mandatory = True),
         "index": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
-        "input_hash": attr.string(mandatory = True),
+        "input_data": attr.string(mandatory = True),
         "install_name": attr.string(mandatory = True),
     },
 )

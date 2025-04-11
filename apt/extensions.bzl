@@ -22,11 +22,11 @@ load("//apt/private:deb_download.bzl", "deb_download")
 load("//apt/private:deb_install.bzl", "deb_install")
 load("//apt/private:deb_repository.bzl", "deb_repository")
 
-def _hash_inputs(tag):
+def _input_data(tag):
     values = dict()
     for attr in ("suites", "architectures", "components", "uri", "packages"):
-        values[attr] = str(getattr(tag, attr))
-    return "inputs-{}".format(hash(json.encode(values)))
+        values[attr] = getattr(tag, attr)
+    return json.encode(values)
 
 def _apt_extension(module_ctx):
     root_direct_deps = []
@@ -38,7 +38,7 @@ def _apt_extension(module_ctx):
                 if cfg.fix_relative_interpreter_with_patchelf and cfg.fix_absolute_interpreter_with_patchelf:
                     fail("Can not set both `fix_relative_interpreter_with_patchelf = True` and `fix_absolute_interpreter_with_patchelf = True` for {}".format(cfg.name))
 
-                input_hash = _hash_inputs(cfg)
+                input_data = _input_data(cfg)
 
                 deb_repository.fetch(
                     name = cfg.name + "_repository",
@@ -55,7 +55,7 @@ def _apt_extension(module_ctx):
                     packages = cfg.packages,
                     lockfile = cfg.lockfile,
                     resolve_transitive = cfg.resolve_transitive,
-                    input_hash = input_hash,
+                    input_data = input_data,
                 )
 
                 for arch in cfg.architectures:
@@ -69,7 +69,7 @@ def _apt_extension(module_ctx):
                         index = cfg.name + "_index",
                         architecture = arch,
                         lockfile = cfg.lockfile,
-                        input_hash = input_hash,
+                        input_data = input_data,
                         install_name = name,
                     )
 

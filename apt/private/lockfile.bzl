@@ -48,27 +48,27 @@ def _create(rctx, lock):
         add_package = lambda *args, **kwargs: _add_package(lock, *args, **kwargs),
         add_package_dependency = lambda *args, **kwargs: _add_package_dependency(lock, *args, **kwargs),
         packages = lambda: lock.packages,
-        input_hash = lambda: lock.input_hash,
+        input_data = lambda: lock.input_data,
         write = lambda out: rctx.file(
             out,
             json.encode_indent(struct(
                 version = lock.version,
-                input_hash = lock.input_hash,
+                input_data = lock.input_data,
                 packages = lock.packages,
             )),
             executable = False,
         ),
         as_json = lambda: json.encode_indent(struct(
             version = lock.version,
-            input_hash = lock.input_hash,
+            input_data = lock.input_data,
             packages = lock.packages,
         )),
     )
 
-def _empty(rctx, input_hash):
+def _empty(rctx, input_data):
     lock = struct(
         version = 1,
-        input_hash = input_hash,
+        input_data = input_data,
         packages = list(),
         fast_package_lookup = dict(),
     )
@@ -81,7 +81,7 @@ def _from_json(rctx, content):
 
     lock = struct(
         version = lock["version"],
-        input_hash = lock["input_hash"],
+        input_data = lock.get("input_data", {}),
         packages = lock["packages"],
         fast_package_lookup = dict(),
     )
