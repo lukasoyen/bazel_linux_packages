@@ -125,10 +125,9 @@ def _find_interpreter(rctx, busybox, arch):
         return str(rctx.path(path).realpath)
     return None
 
-def _fixup_executables(rctx, busybox, patchelf, fix_relative_interpreter, fix_absolute_interpreter):
+def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, fix_absolute_interpreter):
     rctx.report_progress("Fixing executable and libraries")
     pwd = str(rctx.path(".").realpath) + "/"
-    arch = rctx.execute([busybox, "uname", "-m"]).stdout.strip()
 
     lib_paths = []
     for path in sorted(_list_files(rctx, busybox, "etc/ld.so.conf.d/")):
@@ -168,6 +167,8 @@ def _deb_install_impl(rctx):
                 "Misconfigured `install()`. Can not find the provided architecture {} in packages from {}".format(rctx.attr.architecture, rctx.attr.source),
             )
 
+        arch = rctx.execute([busybox, "uname", "-m"]).stdout.strip()
+
         manifest = dict()
         for package in index[rctx.attr.architecture]:
             label = Label(package)
@@ -179,6 +180,7 @@ def _deb_install_impl(rctx):
         if rctx.attr.fix_rpath_with_patchelf:
             _fixup_executables(
                 rctx,
+                arch,
                 busybox,
                 patchelf,
                 rctx.attr.fix_relative_interpreter_with_patchelf,
@@ -186,7 +188,7 @@ def _deb_install_impl(rctx):
             )
 
         for (path, label) in rctx.attr.add_files.items():
-            rctx.symlink(label, path)
+            rctx.symlink(label, path.format(arch = arch))
 
         rctx.file(
             "install_manifest.json",
