@@ -309,6 +309,7 @@ install = tag_class(
 
             The keys are paths into the install dir. The label may
             only refer to a single file.
+            "{arch}" in keys will be replaced by the value as returned by `uname -m`).
             """,
             allow_files = True,
             default = {},

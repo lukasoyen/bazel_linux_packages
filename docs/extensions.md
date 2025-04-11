@@ -143,7 +143,7 @@ attribute.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="apt.install-name"></a>name |  Name of the generated repository   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="apt.install-add_files"></a>add_files |  Experimental: add files to the install dir.<br><br>The keys are paths into the install dir. The label may only refer to a single file.   | Dictionary: String -> Label | optional |  `{}`  |
+| <a id="apt.install-add_files"></a>add_files |  Experimental: add files to the install dir.<br><br>The keys are paths into the install dir. The label may only refer to a single file. "{arch}" in keys will be replaced by the value as returned by `uname -m`).   | Dictionary: String -> Label | optional |  `{}`  |
 | <a id="apt.install-architecture"></a>architecture |  Architectures for which to create the install (defaults to single value architecture from `source` if not given)   | String | optional |  `""`  |
 | <a id="apt.install-build_file"></a>build_file |  Experimental: BUILD.bazel template for the generated install dir.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@bazel_linux_packages//apt:install.BUILD.bazel.tmpl"`  |
 | <a id="apt.install-extra_patchelf_dirs"></a>extra_patchelf_dirs |  Additional paths to inspect for executable/library files to fix with `patchelf`<br><br>Note that this will not recursively inspect subdirectories. "{arch}" will be replaced by the value as returned by `uname -m`).   | List of strings | optional |  `[]`  |
