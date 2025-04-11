@@ -21,6 +21,7 @@ use_repo(apt, "busybox")
 load("//apt/private:deb_download.bzl", "deb_download")
 load("//apt/private:deb_install.bzl", "deb_install")
 load("//apt/private:deb_repository.bzl", "deb_repository")
+load("//apt/private:integrities.bzl", "INTEGRITIES")
 
 def _input_data(tag):
     values = dict()
@@ -28,18 +29,16 @@ def _input_data(tag):
         values[attr] = getattr(tag, attr)
     return json.encode(values)
 
-INTEGRITY = {
-    "https://snapshot.debian.org/archive/debian/20250201T023325Z/dists/bookworm/main/binary-amd64/Packages.xz": "sha256-Fl6W8bB5Dzn+0u4C6nYCJcZD8qjRx4Y220YpESAG7Ws=",
-    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/main/binary-amd64/Packages.xz": "sha256-d1eSH/j+7Zw5NKDJk21EG6SiOL7j6myMHfXLzUP8mGE=",
-    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/main/binary-arm64/Packages.xz": "sha256-4BSyQQIdjAzxbLlPRPTK+3dGUHdpuvNrd4RdOuIuLBs=",
-    "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/focal/universe/binary-amd64/Packages.xz": "sha256-RqdG2seJvZU3rKVNsWgLnf9RwkgVMRE1A4IZnX2WudE=",
-}
+# Whenever these URLs are updated, please also update the `index_integrities()` in
+# `MODULE.bazel` and run `bazel run //:update_index_integrities`.
+DEFAULT_UBUNTU_URL = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+DEFAULT_DEBIAN_URL = "https://snapshot.debian.org/archive/debian/20250201T023325Z"
 
 def _apt_extension(module_ctx):
     root_direct_deps = []
     root_direct_dev_deps = []
 
-    integrity = dict(INTEGRITY)
+    integrity = dict(INTEGRITIES)
 
     for mod in module_ctx.modules:
         for cfg in mod.tags.index_integrity:
@@ -275,7 +274,7 @@ ubuntu = tag_class(
     attrs = ATTR | {
         "uri": attr.string(
             doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
-            default = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+            default = DEFAULT_UBUNTU_URL,
         ),
     },
 )
@@ -284,7 +283,7 @@ debian = tag_class(
     attrs = ATTR | {
         "uri": attr.string(
             doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
-            default = "https://snapshot.debian.org/archive/debian/20250201T023325Z",
+            default = DEFAULT_DEBIAN_URL,
         ),
     },
 )
