@@ -142,18 +142,17 @@ def _package_versions(state, name, arch):
 def _package(state, name, version, arch):
     return util.get_dict(state.packages, keys = (arch, name, version))
 
-def _create(mctx, indices):
+def _create(mctx, index):
     state = struct(
         packages = dict(),
         virtual_packages = dict(),
     )
 
-    for idx in indices:
-        index = json.decode(mctx.read(mctx.path(idx)))
-        for (package_lst, uri) in index.items():
-            # TODO: this is expensive to perform.
-            mctx.report_progress("Parsing package index {}".format(package_lst))
-            _parse_repository(state, mctx.read(Label(package_lst)), uri)
+    idx = json.decode(mctx.read(mctx.path(index)))
+    for (package_lst, uri) in idx.items():
+        # TODO: this is expensive to perform.
+        mctx.report_progress("Parsing package index {}".format(package_lst))
+        _parse_repository(state, mctx.read(Label(package_lst)), uri)
 
     return struct(
         package_versions = lambda **kwargs: _package_versions(state, **kwargs),

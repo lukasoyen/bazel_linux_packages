@@ -50,7 +50,7 @@ def _apt_extension(module_ctx):
 
                 deb_download.index(
                     name = cfg.name + "_index",
-                    sources = [cfg.name + "_repository"],
+                    source = cfg.name + "_repository",
                     architectures = cfg.architectures,
                     packages = cfg.packages,
                     lockfile = cfg.lockfile,

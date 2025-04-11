@@ -67,15 +67,13 @@ def _deb_index_impl(rctx):
     rctx.file(
         "copy.sh",
         rctx.read(rctx.attr._copy_sh_tmpl).format(
-            repo_name = rctx.original_name.removesuffix("_index"),
-            lock_label = rctx.attr.lockfile or workspace_relative_path,
             workspace_relative_path = workspace_relative_path,
         ),
         executable = True,
     )
 
-    indices = [util.get_repo_path(rctx, s, "index.json") for s in rctx.attr.sources]
-    repository = deb_repository.new(rctx, indices)
+    index = util.get_repo_path(rctx, rctx.attr.source, "index.json")
+    repository = deb_repository.new(rctx, index)
     resolver = dependency_resolver.new(repository)
 
     lockf = _resolve(
@@ -200,7 +198,7 @@ def _deb_download_impl(rctx):
 _deb_index = repository_rule(
     implementation = _deb_index_impl,
     attrs = {
-        "sources": attr.string_list(mandatory = True),
+        "source": attr.string(mandatory = True),
         "architectures": attr.string_list(mandatory = True),
         "packages": attr.string_list(mandatory = True),
         "lockfile": attr.label(mandatory = True),
