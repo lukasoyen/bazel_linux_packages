@@ -1,5 +1,19 @@
 {
-	"input_hash": "inputs-336679133",
+	"input_data": {
+		"architectures": [
+			"amd64"
+		],
+		"components": [
+			"main"
+		],
+		"packages": [
+			"g++-12"
+		],
+		"suites": [
+			"bookworm"
+		],
+		"uri": "https://snapshot.debian.org/archive/debian/20250201T023325Z"
+	},
 	"packages": [
 		{
 			"arch": "amd64",

@@ -1,5 +1,21 @@
 {
-	"input_hash": "inputs-1905941113",
+	"input_data": {
+		"architectures": [
+			"amd64"
+		],
+		"components": [
+			"main",
+			"universe"
+		],
+		"packages": [
+			"binutils",
+			"libstdc++-10-dev"
+		],
+		"suites": [
+			"focal"
+		],
+		"uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+	},
 	"packages": [
 		{
 			"arch": "amd64",
