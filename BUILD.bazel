@@ -1,3 +1,5 @@
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 
 gazelle_binary(
@@ -8,4 +10,24 @@ gazelle_binary(
 gazelle(
     name = "gazelle",
     gazelle = "gazelle_bin",
+)
+
+jq(
+    name = "index_integrities",
+    srcs = [
+        "@debian_integrities//:integrity.json",
+        "@ubuntu_integrities//:integrity.json",
+    ],
+    out = "index_integrities.json",
+    args = [
+        "--slurp",
+        "--raw-output",
+    ],
+    filter = '"\\"\\"\\"Generated index integrities.\\"\\"\\"\\nINTEGRITIES = \\(.[0] * .[1])"',
+)
+
+write_source_files(
+    name = "update_index_integrities",
+    diff_test = False,
+    files = {"apt/private/integrities.bzl": ":index_integrities"},
 )

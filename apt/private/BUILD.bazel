@@ -72,3 +72,9 @@ bzl_library(
     visibility = ["//apt:__subpackages__"],
     deps = [":version"],
 )
+
+bzl_library(
+    name = "integrities",
+    srcs = ["integrities.bzl"],
+    visibility = ["//apt:__subpackages__"],
+)

@@ -12,5 +12,6 @@ bzl_library(
         "//apt/private:deb_download",
         "//apt/private:deb_install",
         "//apt/private:deb_repository",
+        "//apt/private:integrities",
     ],
 )

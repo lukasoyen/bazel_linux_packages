@@ -49,3 +49,41 @@ use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
 bazel_dep(name = "gazelle", version = "0.42.0", dev_dependency = True, repo_name = "bazel_gazelle")
 bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3", dev_dependency = True)
+
+index_integrities = use_repo_rule("//apt/private:deb_repository.bzl", "index_integrities")
+
+index_integrities(
+    name = "ubuntu_integrities",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    components = [
+        "main",
+        "universe",
+    ],
+    dev_dependency = True,
+    suites = [
+        "focal",
+        "jammy",
+        "noble",
+        "oracular",
+    ],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+
+index_integrities(
+    name = "debian_integrities",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    components = ["main"],
+    dev_dependency = True,
+    suites = [
+        "bullseye",
+        "bookworm",
+        "trixie",
+    ],
+    uri = "https://snapshot.debian.org/archive/debian/20250201T023325Z",
+)

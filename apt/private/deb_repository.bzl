@@ -3,7 +3,7 @@
 load(":util.bzl", "util")
 load(":version_constraint.bzl", "version_constraint")
 
-def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
+def _fetch_package_index(rctx, url, dist, comp, arch, integrity, check_for_failure = True):
     target_triple = "{dist}/{comp}/{arch}".format(dist = dist, comp = comp, arch = arch)
 
     # See https://linux.die.net/man/1/xz , https://linux.die.net/man/1/gzip , and https://linux.die.net/man/1/bzip2
@@ -41,7 +41,7 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity):
 
         failed_attempts.append((dist_url, download, decompress_r))
 
-    if len(failed_attempts) == len(supported_extensions):
+    if check_for_failure and len(failed_attempts) == len(supported_extensions):
         attempt_messages = []
         for (url, download, decompress) in failed_attempts:
             reason = "unknown"
@@ -228,6 +228,45 @@ FETCH_ATTR = {
 _fetch = repository_rule(
     implementation = _fetch_impl,
     attrs = FETCH_ATTR,
+)
+
+def _index_integrities_impl(rctx):
+    integrity = {}
+    for dist in rctx.attr.suites:
+        for arch in rctx.attr.architectures:
+            for comp in rctx.attr.components:
+                uri = rctx.attr.uri.rstrip("/")
+                rctx.report_progress("Fetching package index: {}/{} for {}".format(dist, comp, arch))
+                (_, updates) = _fetch_package_index(
+                    rctx,
+                    uri,
+                    dist,
+                    comp,
+                    arch,
+                    {},
+                    check_for_failure = False,
+                )
+                integrity.update(updates)
+
+    rctx.file(
+        "integrity.json",
+        json.encode_indent(integrity),
+        executable = False,
+    )
+    rctx.file(
+        "BUILD.bazel",
+        'exports_files(["integrity.json"])',
+        executable = False,
+    )
+
+index_integrities = repository_rule(
+    implementation = _index_integrities_impl,
+    attrs = {
+        "suites": attr.string_list(mandatory = True),
+        "architectures": attr.string_list(mandatory = True),
+        "components": attr.string_list(mandatory = True),
+        "uri": attr.string(mandatory = True),
+    },
 )
 
 deb_repository = struct(
