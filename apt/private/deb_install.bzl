@@ -26,6 +26,8 @@ def _correct_symlinks(rctx, busybox, path):
                 # preferably this would be a`rctx.symlink(new_target, name)`
                 # but that normalizes `new_target`
                 rctx.execute(["ln", "-s", new_target, name])
+            if target == "." and name != "./":
+                rctx.execute(["rm", "-f", name])
 
 def _extract_data_file(rctx, busybox, path):
     cmd = [busybox, "tar", "-xf", str(path)]
