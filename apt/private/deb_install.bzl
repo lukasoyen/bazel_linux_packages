@@ -192,6 +192,17 @@ def _deb_install_impl(rctx):
         for (path, label) in rctx.attr.add_files.items():
             rctx.symlink(label, path.format(arch = arch))
 
+        for name, cmd in rctx.attr.post_install_cmd.items():
+            result = rctx.execute(cmd)
+            if result.return_code:
+                fail("Failed run command {}: {} ({}, {}, {})".format(
+                    name,
+                    " ".join(cmd),
+                    result.return_code,
+                    result.stdout,
+                    result.stderr,
+                ))
+
         rctx.file(
             "install_manifest.json",
             json.encode_indent(manifest),
@@ -221,6 +232,7 @@ deb_install = repository_rule(
         "fix_absolute_interpreter_with_patchelf": attr.bool(mandatory = True),
         "patchelf_dirs": attr.string_list(mandatory = True),
         "add_files": attr.string_keyed_label_dict(mandatory = True),
+        "post_install_cmd": attr.string_list_dict(mandatory = True),
         "build_file": attr.label(mandatory = True),
     },
 )
