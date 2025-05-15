@@ -94,6 +94,7 @@ def _apt_extension(module_ctx):
                         fix_absolute_interpreter_with_patchelf = cfg.fix_absolute_interpreter_with_patchelf,
                         patchelf_dirs = cfg.patchelf_dirs + cfg.extra_patchelf_dirs,
                         add_files = cfg.add_files,
+                        post_install_cmd = cfg.post_install_cmd,
                         build_file = cfg.build_file,
                     )
 
@@ -194,6 +195,14 @@ ATTR = {
             "{arch}" in keys will be replaced by the value as returned by `uname -m`).
             """,
         allow_files = True,
+        default = {},
+    ),
+    "post_install_cmd": attr.string_list_dict(
+        doc = """
+            Experimental: run a command after the install.
+
+            The keys are the unused, the values the command to run as given to `rctx.execute()`.
+            """,
         default = {},
     ),
     "build_file": attr.label(

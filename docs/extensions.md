@@ -27,16 +27,16 @@ apt = use_extension("@bazel_linux_packages//apt:extensions.bzl", "apt")
 apt.index_integrity(<a href="#apt.index_integrity-integrities">integrities</a>)
 apt.download(<a href="#apt.download-name">name</a>, <a href="#apt.download-add_files">add_files</a>, <a href="#apt.download-architectures">architectures</a>, <a href="#apt.download-build_file">build_file</a>, <a href="#apt.download-components">components</a>, <a href="#apt.download-extra_patchelf_dirs">extra_patchelf_dirs</a>,
              <a href="#apt.download-fix_absolute_interpreter_with_patchelf">fix_absolute_interpreter_with_patchelf</a>, <a href="#apt.download-fix_relative_interpreter_with_patchelf">fix_relative_interpreter_with_patchelf</a>,
-             <a href="#apt.download-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.download-lockfile">lockfile</a>, <a href="#apt.download-packages">packages</a>, <a href="#apt.download-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.download-resolve_transitive">resolve_transitive</a>, <a href="#apt.download-suites">suites</a>,
-             <a href="#apt.download-uri">uri</a>)
+             <a href="#apt.download-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.download-lockfile">lockfile</a>, <a href="#apt.download-packages">packages</a>, <a href="#apt.download-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.download-post_install_cmd">post_install_cmd</a>,
+             <a href="#apt.download-resolve_transitive">resolve_transitive</a>, <a href="#apt.download-suites">suites</a>, <a href="#apt.download-uri">uri</a>)
 apt.ubuntu(<a href="#apt.ubuntu-name">name</a>, <a href="#apt.ubuntu-add_files">add_files</a>, <a href="#apt.ubuntu-architectures">architectures</a>, <a href="#apt.ubuntu-build_file">build_file</a>, <a href="#apt.ubuntu-components">components</a>, <a href="#apt.ubuntu-extra_patchelf_dirs">extra_patchelf_dirs</a>,
            <a href="#apt.ubuntu-fix_absolute_interpreter_with_patchelf">fix_absolute_interpreter_with_patchelf</a>, <a href="#apt.ubuntu-fix_relative_interpreter_with_patchelf">fix_relative_interpreter_with_patchelf</a>,
-           <a href="#apt.ubuntu-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.ubuntu-lockfile">lockfile</a>, <a href="#apt.ubuntu-packages">packages</a>, <a href="#apt.ubuntu-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.ubuntu-resolve_transitive">resolve_transitive</a>, <a href="#apt.ubuntu-suites">suites</a>,
-           <a href="#apt.ubuntu-uri">uri</a>)
+           <a href="#apt.ubuntu-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.ubuntu-lockfile">lockfile</a>, <a href="#apt.ubuntu-packages">packages</a>, <a href="#apt.ubuntu-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.ubuntu-post_install_cmd">post_install_cmd</a>,
+           <a href="#apt.ubuntu-resolve_transitive">resolve_transitive</a>, <a href="#apt.ubuntu-suites">suites</a>, <a href="#apt.ubuntu-uri">uri</a>)
 apt.debian(<a href="#apt.debian-name">name</a>, <a href="#apt.debian-add_files">add_files</a>, <a href="#apt.debian-architectures">architectures</a>, <a href="#apt.debian-build_file">build_file</a>, <a href="#apt.debian-components">components</a>, <a href="#apt.debian-extra_patchelf_dirs">extra_patchelf_dirs</a>,
            <a href="#apt.debian-fix_absolute_interpreter_with_patchelf">fix_absolute_interpreter_with_patchelf</a>, <a href="#apt.debian-fix_relative_interpreter_with_patchelf">fix_relative_interpreter_with_patchelf</a>,
-           <a href="#apt.debian-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.debian-lockfile">lockfile</a>, <a href="#apt.debian-packages">packages</a>, <a href="#apt.debian-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.debian-resolve_transitive">resolve_transitive</a>, <a href="#apt.debian-suites">suites</a>,
-           <a href="#apt.debian-uri">uri</a>)
+           <a href="#apt.debian-fix_rpath_with_patchelf">fix_rpath_with_patchelf</a>, <a href="#apt.debian-lockfile">lockfile</a>, <a href="#apt.debian-packages">packages</a>, <a href="#apt.debian-patchelf_dirs">patchelf_dirs</a>, <a href="#apt.debian-post_install_cmd">post_install_cmd</a>,
+           <a href="#apt.debian-resolve_transitive">resolve_transitive</a>, <a href="#apt.debian-suites">suites</a>, <a href="#apt.debian-uri">uri</a>)
 </pre>
 
 
@@ -118,6 +118,7 @@ Multiple `download()` tags are allowed but need unique names.
 | <a id="apt.download-lockfile"></a>lockfile |  The lock file to use for the index (it is fine for the file to not exist yet)   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="apt.download-packages"></a>packages |  Packages to download   | List of strings | required |  |
 | <a id="apt.download-patchelf_dirs"></a>patchelf_dirs |  Paths to inspect for executable/library files to fix with `patchelf`<br><br>Note that this will not recursively inspect subdirectories. "{arch}" will be replaced by the value as returned by `uname -m`).   | List of strings | optional |  `["lib/{arch}-linux-gnu", "usr/lib/{arch}-linux-gnu", "usr/bin"]`  |
+| <a id="apt.download-post_install_cmd"></a>post_install_cmd |  Experimental: run a command after the install.<br><br>The keys are the unused, the values the command to run as given to `rctx.execute()`.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> List of strings</a> | optional |  `{}`  |
 | <a id="apt.download-resolve_transitive"></a>resolve_transitive |  Whether dependencies of dependencies should be resolved and added to the lockfile.   | Boolean | optional |  `True`  |
 | <a id="apt.download-suites"></a>suites |  Deb suites to download the packages from (see DEB822)   | List of strings | required |  |
 | <a id="apt.download-uri"></a>uri |  Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)   | String | required |  |
@@ -186,6 +187,7 @@ Multiple `ubuntu()` tags are allowed but need unique names.
 | <a id="apt.ubuntu-lockfile"></a>lockfile |  The lock file to use for the index (it is fine for the file to not exist yet)   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="apt.ubuntu-packages"></a>packages |  Packages to download   | List of strings | required |  |
 | <a id="apt.ubuntu-patchelf_dirs"></a>patchelf_dirs |  Paths to inspect for executable/library files to fix with `patchelf`<br><br>Note that this will not recursively inspect subdirectories. "{arch}" will be replaced by the value as returned by `uname -m`).   | List of strings | optional |  `["lib/{arch}-linux-gnu", "usr/lib/{arch}-linux-gnu", "usr/bin"]`  |
+| <a id="apt.ubuntu-post_install_cmd"></a>post_install_cmd |  Experimental: run a command after the install.<br><br>The keys are the unused, the values the command to run as given to `rctx.execute()`.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> List of strings</a> | optional |  `{}`  |
 | <a id="apt.ubuntu-resolve_transitive"></a>resolve_transitive |  Whether dependencies of dependencies should be resolved and added to the lockfile.   | Boolean | optional |  `True`  |
 | <a id="apt.ubuntu-suites"></a>suites |  Deb suites to download the packages from (see DEB822)   | List of strings | required |  |
 | <a id="apt.ubuntu-uri"></a>uri |  Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)   | String | optional |  `"https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"`  |
@@ -254,6 +256,7 @@ Multiple `debian()` tags are allowed but need unique names.
 | <a id="apt.debian-lockfile"></a>lockfile |  The lock file to use for the index (it is fine for the file to not exist yet)   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="apt.debian-packages"></a>packages |  Packages to download   | List of strings | required |  |
 | <a id="apt.debian-patchelf_dirs"></a>patchelf_dirs |  Paths to inspect for executable/library files to fix with `patchelf`<br><br>Note that this will not recursively inspect subdirectories. "{arch}" will be replaced by the value as returned by `uname -m`).   | List of strings | optional |  `["lib/{arch}-linux-gnu", "usr/lib/{arch}-linux-gnu", "usr/bin"]`  |
+| <a id="apt.debian-post_install_cmd"></a>post_install_cmd |  Experimental: run a command after the install.<br><br>The keys are the unused, the values the command to run as given to `rctx.execute()`.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> List of strings</a> | optional |  `{}`  |
 | <a id="apt.debian-resolve_transitive"></a>resolve_transitive |  Whether dependencies of dependencies should be resolved and added to the lockfile.   | Boolean | optional |  `True`  |
 | <a id="apt.debian-suites"></a>suites |  Deb suites to download the packages from (see DEB822)   | List of strings | required |  |
 | <a id="apt.debian-uri"></a>uri |  Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)   | String | optional |  `"https://snapshot.debian.org/archive/debian/20250201T023325Z"`  |
