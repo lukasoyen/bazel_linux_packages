@@ -47,7 +47,7 @@ use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
 
 # Dev dependencies
 bazel_dep(name = "gazelle", version = "0.44.0", dev_dependency = True, repo_name = "bazel_gazelle")
-bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependency = True)
+bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.8.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.2.0", dev_dependency = True)
 
 index_integrities = use_repo_rule("//apt/private:deb_repository.bzl", "index_integrities")
