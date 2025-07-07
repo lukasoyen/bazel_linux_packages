@@ -65,6 +65,34 @@ See [e2e/](e2e/README.md) for end to end tests and
   a newer Linux kernel than you are running and error out. Use
   `file path/to/your/binary` to check which kernel version is the minimum required.
 
+## Key Differences to `rules_distroless`
+
+This project was forked from
+[`rules_distroless`](https://github.com/GoogleContainerTools/rules_distroless)
+but serves a distinct purpose.
+
+`bazel_linux_packages` is focused on downloading and extracting individual
+`.deb` packages (and their dependencies) for use as tooling or libraries in
+Bazel builds for the execution platform. It is ideal when you need to run
+packaged binaries, create toolchains, build sysroots, or access specific
+libraries from Linux distributions within your build process. The result is a
+Bazel repository containing the extracted package contents, ready for use in
+your build rules.
+
+On the other hand, `rules_distroless` is designed to create complete
+Linux/Debian installations from scratch, mainly for building minimal container
+images or full system environments for the target platform. Use it when you need
+to assemble a full Linux filesystem layout, create distroless containers, or
+perform system administration tasks as part of your build. The output is a
+complete filesystem tree suitable for use as a container image or runtime
+environment.
+
+Use `bazel_linux_packages` for integrating specific Linux packages or tools into
+your Bazel build, and use `rules_distroless` when you need to build a full
+minimal Linux environment or container image. Both can be combined—extract
+development tools with `bazel_linux_packages`, then assemble your final runtime
+with `rules_distroless`.
+
 ## Related
 
 - [debian_dependency_bazelizer](https://github.com/shabanzd/debian_dependency_bazelizer)
