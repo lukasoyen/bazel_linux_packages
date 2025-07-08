@@ -1,6 +1,6 @@
 bazel_dep(name = "bazel_linux_packages", version = "0.0.0")
 bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "bazel_skylib", version = "1.8.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
 
 local_path_override(
     module_name = "bazel_linux_packages",
