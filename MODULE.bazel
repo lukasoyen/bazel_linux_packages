@@ -3,7 +3,7 @@
 module(
     name = "bazel_linux_packages",
     version = "0.0.0",
-    bazel_compatibility = [">=8.1.0"],
+    bazel_compatibility = [">=7.6.1"],
     compatibility_level = 1,
 )
 

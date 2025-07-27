@@ -135,13 +135,13 @@ def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, 
     for path in sorted(_list_files(rctx, busybox, "etc/ld.so.conf.d/")):
         lib_paths.extend(_read_ld_so_conf(rctx, path))
 
-    seen = set()
+    seen = dict()
 
     interpreter_path = None
     interpreter = _find_interpreter(rctx, busybox, arch)
     if interpreter != None:
         # We don't want to rpath patch the ld*.so
-        seen.add(interpreter.removeprefix(pwd))
+        seen[interpreter.removeprefix(pwd)] = True
 
         if fix_relative_interpreter:
             interpreter_path = "./external/{}/{}".format(rctx.attr.name, interpreter.removeprefix(pwd))
@@ -155,7 +155,7 @@ def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, 
                 _fixup_rpath(rctx, patchelf, realpath, lib_paths)
                 if interpreter_path != None:
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
-                seen.add(realpath)
+                seen[realpath] = True
 
 def _deb_install_impl(rctx):
     busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")
@@ -225,6 +225,7 @@ def _deb_install_impl(rctx):
 deb_install = repository_rule(
     implementation = _deb_install_impl,
     attrs = {
+        "apparent_name": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
         "source": attr.string(mandatory = True),
         "fix_rpath_with_patchelf": attr.bool(mandatory = True),
