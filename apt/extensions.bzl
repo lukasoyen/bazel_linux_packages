@@ -62,6 +62,7 @@ def _apt_extension(module_ctx):
 
                 deb_download.index(
                     name = cfg.name + "_index",
+                    apparent_name = cfg.name + "_index",
                     source = cfg.name + "_repository",
                     architectures = cfg.architectures,
                     packages = cfg.packages,
@@ -78,6 +79,7 @@ def _apt_extension(module_ctx):
 
                     deb_download.download(
                         name = name + "_download",
+                        apparent_name = name + "_download",
                         index = cfg.name + "_index",
                         architecture = arch,
                         lockfile = cfg.lockfile,
@@ -87,6 +89,7 @@ def _apt_extension(module_ctx):
 
                     deb_install(
                         name = name,
+                        apparent_name = name,
                         architecture = arch,
                         source = name + "_download",
                         fix_rpath_with_patchelf = cfg.fix_rpath_with_patchelf,

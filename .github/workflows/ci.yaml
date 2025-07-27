@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04"]
-        bazelversion: [8.1.0]
+        bazelversion: [7.6.1, 8.3.1]
         folder: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/toolchains"]
         include:
           - os: "ubuntu-22.04-arm"
