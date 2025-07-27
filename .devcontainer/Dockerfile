@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:bookworm
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:bookworm
 
 # Download bazelisk and place it in $PATH
 RUN wget https://github.com/bazelbuild/bazelisk/releases/download/v1.18.0/bazelisk-linux-amd64
