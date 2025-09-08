@@ -17,31 +17,24 @@ alias(
     actual = "install_manifest.json",
 )
 
+FILES = glob(
+    [{glob_pattern}],
+    exclude = [
+        "BUILD.bazel",
+        "REPO.bazel",
+        "install_manifest.json",
+        {glob_excludes}
+    ],
+    allow_empty = True, # during lockfile generation
+)
+
 filegroup(
     name = "files",
-    srcs = glob(
-        ["**"],
-        exclude = [
-            "BUILD.bazel",
-            "REPO.bazel",
-            "install_manifest.json",
-            "usr/share/man/**",
-        ],
-        allow_empty = True, # during lockfile generation
-    ),
+    srcs = FILES,
 )
 
 exports_files(
-    srcs = glob(
-        ["**"],
-        exclude = [
-            "BUILD.bazel",
-            "REPO.bazel",
-            "install_manifest.json",
-            "usr/share/man/**",
-        ],
-        allow_empty = True, # during lockfile generation
-    ),
+    srcs = FILES,
 )
 
 directory(

@@ -99,6 +99,8 @@ def _apt_extension(module_ctx):
                         add_files = cfg.add_files,
                         post_install_cmd = cfg.post_install_cmd,
                         build_file = cfg.build_file,
+                        glob_pattern = cfg.glob_pattern,
+                        glob_excludes = cfg.glob_excludes,
                     )
 
                     if mod.is_root:
@@ -211,6 +213,14 @@ ATTR = {
     "build_file": attr.label(
         doc = "Experimental: BUILD.bazel template for the generated install dir.",
         default = "//apt:install.BUILD.bazel.tmpl",
+    ),
+    "glob_pattern": attr.string_list(
+        doc = "Experimental: `glob()` pattern for the default `build_file` template.",
+        default = ["**"],
+    ),
+    "glob_excludes": attr.string_list(
+        doc = "Experimental: `glob()` pattern excludes for the default `build_file` template.",
+        default = ["usr/share/man/**"],
     ),
 }
 

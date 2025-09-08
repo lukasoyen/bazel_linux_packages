@@ -1,5 +1,4 @@
 docs/*.md
 *.yaml
 *.lock.json
-expected_manifest_amd64.json
-expected_manifest_arm64.json
+expected_manifest*.json
