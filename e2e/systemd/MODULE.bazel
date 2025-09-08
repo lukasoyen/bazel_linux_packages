@@ -1,0 +1,26 @@
+bazel_dep(name = "bazel_linux_packages", version = "0.0.0")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+
+local_path_override(
+    module_name = "bazel_linux_packages",
+    path = "../..",
+)
+
+apt = use_extension(
+    "@bazel_linux_packages//apt:extensions.bzl",
+    "apt",
+    dev_dependency = True,
+)
+apt.debian(
+    name = "systemd",
+    architectures = ["amd64"],
+    glob_excludes = [
+        "usr/share/man/**",
+        "**/*cryptsetup.slice",
+    ],
+    lockfile = "//:bookworm.lock.json",
+    packages = ["systemd"],
+    suites = ["bookworm"],
+)
+use_repo(apt, "systemd")
