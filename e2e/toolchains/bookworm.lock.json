@@ -3,16 +3,23 @@
 		"architectures": [
 			"amd64"
 		],
-		"components": [
-			"main"
-		],
 		"packages": [
 			"g++-12"
 		],
-		"suites": [
-			"bookworm"
-		],
-		"uri": "https://snapshot.debian.org/archive/debian/20250201T023325Z"
+		"sources": [
+			{
+				"architectures": [
+					"amd64"
+				],
+				"components": [
+					"main"
+				],
+				"suites": [
+					"bookworm"
+				],
+				"uri": "https://snapshot.debian.org/archive/debian/20250201T023325Z"
+			}
+		]
 	},
 	"packages": [
 		{
@@ -712,5 +719,5 @@
 			"version": "1:1.2.13.dfsg-1"
 		}
 	],
-	"version": 1
+	"version": 2
 }

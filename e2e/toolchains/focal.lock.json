@@ -3,17 +3,24 @@
 		"architectures": [
 			"amd64"
 		],
-		"components": [
-			"main",
-			"universe"
-		],
 		"packages": [
 			"clang-10"
 		],
-		"suites": [
-			"focal"
-		],
-		"uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+		"sources": [
+			{
+				"architectures": [
+					"amd64"
+				],
+				"components": [
+					"main",
+					"universe"
+				],
+				"suites": [
+					"focal"
+				],
+				"uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+			}
+		]
 	},
 	"packages": [
 		{
@@ -615,5 +622,5 @@
 			"version": "1:1.2.11.dfsg-2ubuntu1"
 		}
 	],
-	"version": 1
+	"version": 2
 }

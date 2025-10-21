@@ -42,6 +42,19 @@ def _resolve(rctx, input_data, resolver, architectures, packages, include_transi
                 lockf.add_package_dependency(package, dep, arch)
     return lockf
 
+def _get_source(rctx, sources):
+    source_objs = []
+    for name in sources:
+        source = util.get_repo_path(rctx, name, "source.json")
+        obj = json.decode(rctx.read(rctx.path(source)))
+        source_objs.append(obj)
+    return source_objs
+
+def _get_input_data_with_sources(rctx):
+    input_data = json.decode(rctx.attr.input_data)
+    input_data["sources"] = _get_source(rctx, rctx.attr.sources)
+    return input_data
+
 _INDEX_BUILD_TMPL = """
 filegroup(
     name = "lockfile",
@@ -73,13 +86,16 @@ def _deb_index_impl(rctx):
         executable = True,
     )
 
-    index = util.get_repo_path(rctx, rctx.attr.source, "index.json")
-    repository = deb_repository.new(rctx, index)
-    resolver = dependency_resolver.new(repository)
+    resolver = dependency_resolver.new(
+        [
+            deb_repository.new(rctx, util.get_repo_path(rctx, source, "index.json"))
+            for source in rctx.attr.sources
+        ],
+    )
 
     lockf = _resolve(
         rctx,
-        json.decode(rctx.attr.input_data),
+        _get_input_data_with_sources(rctx),
         resolver,
         rctx.attr.architectures,
         rctx.attr.packages,
@@ -178,7 +194,7 @@ def _deb_download_impl(rctx):
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
-        if not lockf.input_data_equals(json.decode(rctx.attr.input_data)):
+        if not lockf.input_data_equals(_get_input_data_with_sources(rctx)):
             util.warning(
                 rctx,
                 "Lockfiles need to be recreated. Please run:\n" + lock_cmd,
@@ -201,7 +217,7 @@ _deb_index = repository_rule(
     implementation = _deb_index_impl,
     attrs = {
         "apparent_name": attr.string(mandatory = True),
-        "source": attr.string(mandatory = True),
+        "sources": attr.string_list(mandatory = True),
         "architectures": attr.string_list(mandatory = True),
         "packages": attr.string_list(mandatory = True),
         "lockfile": attr.label(mandatory = True),
@@ -221,6 +237,7 @@ _deb_download = repository_rule(
         "index": attr.string(mandatory = True),
         "architecture": attr.string(mandatory = True),
         "input_data": attr.string(mandatory = True),
+        "sources": attr.string_list(mandatory = True),
         "install_name": attr.string(mandatory = True),
     },
 )

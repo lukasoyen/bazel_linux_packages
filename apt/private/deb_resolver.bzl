@@ -3,10 +3,12 @@
 load(":version.bzl", version_lib = "version")
 load(":version_constraint.bzl", "version_constraint")
 
-def _resolve_package(state, name, version, arch, requested_packages):
-    # First check if the constraint is satisfied by a virtual package
-    virtual_packages = state.repository.virtual_packages(name = name, arch = arch)
-    virtual_packages.extend(state.repository.virtual_packages(name = name, arch = "all"))
+def _resolve_virtual_package(state, name, version, arch, requested_packages):
+    virtual_packages = []
+    for repo in state.repository:
+        virtual_packages.extend(repo.virtual_packages(name = name, arch = arch))
+    for repo in state.repository:
+        virtual_packages.extend(repo.virtual_packages(name = name, arch = "all"))
 
     candidates = [
         package
@@ -47,10 +49,15 @@ def _resolve_package(state, name, version, arch, requested_packages):
             name,
             [package["Package"] for package in candidates],
         ))
+    return None
 
+def _resolve_package(state, name, version, arch, requested_packages):
     # Get available versions of the package
-    versions_by_arch = state.repository.package_versions(name = name, arch = arch)
-    versions_by_any_arch = state.repository.package_versions(name = name, arch = "all")
+    versions_by_arch = []
+    versions_by_any_arch = []
+    for repo in state.repository:
+        versions_by_arch.extend(repo.package_versions(name = name, arch = arch))
+        versions_by_any_arch.extend(repo.package_versions(name = name, arch = "all"))
 
     # Order packages by highest to lowest
     versions = version_lib.sort(versions_by_arch + versions_by_any_arch, reverse = True)
@@ -70,10 +77,19 @@ def _resolve_package(state, name, version, arch, requested_packages):
         # First element in the versions list is the latest version.
         selected_version = versions[0]
 
-    package = state.repository.package(name = name, version = selected_version, arch = arch)
+    package = None
+    for repo in state.repository:
+        package = repo.package(name = name, version = selected_version, arch = arch)
+        if package:
+            break
     if not package:
-        package = state.repository.package(name = name, version = selected_version, arch = "all")
+        for repo in state.repository:
+            package = repo.package(name = name, version = selected_version, arch = "all")
+            if package:
+                break
 
+    if not package:
+        package = _resolve_virtual_package(state, name, version, arch, requested_packages)
     return package
 
 _ITERATION_MAX_ = 2147483646
