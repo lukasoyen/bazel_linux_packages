@@ -137,6 +137,7 @@ def _resolve_optionals_test(ctx):
         name = "eject",
         version = ("=", _test_version),
         arch = _test_arch,
+        requested_packages = ["eject"],
     )
     asserts.equals(env, "eject", root_package["Package"])
     asserts.equals(env, "libc6-dev", dependencies[0]["Package"])
@@ -161,6 +162,7 @@ def _resolve_architecture_specific_packages_test(ctx):
         name = "glibc",
         version = ("=", _test_version),
         arch = "amd64",
+        requested_packages = ["glibc"],
     )
     asserts.equals(env, "glibc", root_package["Package"])
     asserts.equals(env, "all", root_package["Architecture"])
@@ -172,6 +174,7 @@ def _resolve_architecture_specific_packages_test(ctx):
         name = "glibc",
         version = ("=", _test_version),
         arch = "i386",
+        requested_packages = ["glibc"],
     )
     asserts.equals(env, "glibc", root_package["Package"])
     asserts.equals(env, "all", root_package["Architecture"])
@@ -191,16 +194,19 @@ def _resolve_aliases(ctx):
 
         return add_package
 
-    def check_resolves(with_packages, resolved_name):
+    def check_resolves(with_packages, requested_packages = None, resolved_name = None):
         idx = _make_index()
 
         for package in with_packages:
             package(idx)
 
+        requested_packages = requested_packages or ["foo"]
+
         (root_package, dependencies, _) = idx.resolution.resolve_all(
             name = "foo",
             version = ("=", _test_version),
             arch = "amd64",
+            requested_packages = requested_packages,
         )
         asserts.equals(env, "foo", root_package["Package"])
         asserts.equals(env, "amd64", root_package["Architecture"])
@@ -243,6 +249,13 @@ def _resolve_aliases(ctx):
         with_package(package = "foo", depends = "bar"),
         with_package(package = "bar-plus", provides = "bar (= 1.0)"),
     ], resolved_name = "bar-plus")
+
+    # Un-versioned, multiple candidates, "bar-plus" directly requested
+    check_resolves([
+        with_package(package = "foo", depends = "bar"),
+        with_package(package = "bar-plus", provides = "bar"),
+        with_package(package = "bar-plus2", provides = "bar"),
+    ], requested_packages = ["foo", "bar-plus"], resolved_name = "bar-plus")
 
     # Un-versioned does not match with multiple candidates
     check_resolves([

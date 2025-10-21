@@ -24,6 +24,7 @@ def _resolve(rctx, input_data, resolver, architectures, packages, include_transi
                 name = constraint["name"],
                 version = constraint["version"],
                 arch = arch,
+                requested_packages = packages,
                 include_transitive = include_transitive,
             )
 
