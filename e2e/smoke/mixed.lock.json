@@ -1,0 +1,146 @@
+{
+	"input_data": {
+		"architectures": [
+			"amd64",
+			"arm64"
+		],
+		"packages": [
+			"busybox"
+		],
+		"sources": [
+			{
+				"architectures": [
+					"amd64",
+					"arm64"
+				],
+				"components": [
+					"main"
+				],
+				"suites": [
+					"bookworm"
+				],
+				"uri": "https://snapshot.debian.org/archive/debian/20250201T023325Z"
+			},
+			{
+				"architectures": [
+					"amd64",
+					"arm64"
+				],
+				"components": [
+					"main"
+				],
+				"suites": [
+					"focal"
+				],
+				"uri": "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+			}
+		]
+	},
+	"packages": [
+		{
+			"arch": "amd64",
+			"dependencies": [
+				{
+					"key": "gcc-12-base_12.2.0-14_amd64",
+					"name": "gcc-12-base",
+					"version": "12.2.0-14"
+				},
+				{
+					"key": "libc6_2.36-9-p-deb12u9_amd64",
+					"name": "libc6",
+					"version": "2.36-9+deb12u9"
+				},
+				{
+					"key": "libgcc-s1_12.2.0-14_amd64",
+					"name": "libgcc-s1",
+					"version": "12.2.0-14"
+				}
+			],
+			"key": "busybox_1-1.35.0-4-p-b3_amd64",
+			"name": "busybox",
+			"sha256": "28249bea5fedba0efa6186b7c42cf3cb57ff1c1fbd850fc5a2fbf15c3c085bd6",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/b/busybox/busybox_1.35.0-4+b3_amd64.deb",
+			"version": "1:1.35.0-4+b3"
+		},
+		{
+			"arch": "arm64",
+			"dependencies": [
+				{
+					"key": "gcc-12-base_12.2.0-14_arm64",
+					"name": "gcc-12-base",
+					"version": "12.2.0-14"
+				},
+				{
+					"key": "libc6_2.36-9-p-deb12u9_arm64",
+					"name": "libc6",
+					"version": "2.36-9+deb12u9"
+				},
+				{
+					"key": "libgcc-s1_12.2.0-14_arm64",
+					"name": "libgcc-s1",
+					"version": "12.2.0-14"
+				}
+			],
+			"key": "busybox_1-1.35.0-4-p-b3_arm64",
+			"name": "busybox",
+			"sha256": "12ff3f0c05fb0cef5307a1809cd64ce167c27dac122753d035c755112441cd50",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/b/busybox/busybox_1.35.0-4+b3_arm64.deb",
+			"version": "1:1.35.0-4+b3"
+		},
+		{
+			"arch": "amd64",
+			"dependencies": [],
+			"key": "gcc-12-base_12.2.0-14_amd64",
+			"name": "gcc-12-base",
+			"sha256": "1a03df5a57833d65b5bb08cfa19d50e76f29088dc9e64fb934af42d9023a0807",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/gcc-12/gcc-12-base_12.2.0-14_amd64.deb",
+			"version": "12.2.0-14"
+		},
+		{
+			"arch": "arm64",
+			"dependencies": [],
+			"key": "gcc-12-base_12.2.0-14_arm64",
+			"name": "gcc-12-base",
+			"sha256": "e1f2fb7212546c0e360af8df26303608f7b09e123ac9c96e15872d1ec1ce3275",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/gcc-12/gcc-12-base_12.2.0-14_arm64.deb",
+			"version": "12.2.0-14"
+		},
+		{
+			"arch": "amd64",
+			"dependencies": [],
+			"key": "libc6_2.36-9-p-deb12u9_amd64",
+			"name": "libc6",
+			"sha256": "3a043b9dbf1a8c8b5a9e2268253e6dca8c7d431bd7a202fea96364abf374fea9",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/glibc/libc6_2.36-9+deb12u9_amd64.deb",
+			"version": "2.36-9+deb12u9"
+		},
+		{
+			"arch": "arm64",
+			"dependencies": [],
+			"key": "libc6_2.36-9-p-deb12u9_arm64",
+			"name": "libc6",
+			"sha256": "564ad8beb7d6d80620ed5f6387cd0da5e3bc839e0c43293b4233678e8366c283",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/glibc/libc6_2.36-9+deb12u9_arm64.deb",
+			"version": "2.36-9+deb12u9"
+		},
+		{
+			"arch": "amd64",
+			"dependencies": [],
+			"key": "libgcc-s1_12.2.0-14_amd64",
+			"name": "libgcc-s1",
+			"sha256": "f3d1d48c0599aea85b7f2077a01d285badc42998c1a1e7473935d5cf995c8141",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/gcc-12/libgcc-s1_12.2.0-14_amd64.deb",
+			"version": "12.2.0-14"
+		},
+		{
+			"arch": "arm64",
+			"dependencies": [],
+			"key": "libgcc-s1_12.2.0-14_arm64",
+			"name": "libgcc-s1",
+			"sha256": "6fce2268d8f3152a4e84634f5a24133d3c62903b2f9b11b9c59235cbbc1b23a8",
+			"url": "https://snapshot.debian.org/archive/debian/20250201T023325Z/pool/main/g/gcc-12/libgcc-s1_12.2.0-14_arm64.deb",
+			"version": "12.2.0-14"
+		}
+	],
+	"version": 2
+}

@@ -208,6 +208,19 @@ def _fetch_impl(rctx):
         fail(msg)
 
     rctx.file(
+        "source.json",
+        json.encode_indent(
+            {
+                "suites": rctx.attr.suites,
+                "architectures": rctx.attr.architectures,
+                "components": rctx.attr.components,
+                "uri": rctx.attr.uri.rstrip("/"),
+            },
+        ),
+        executable = False,
+    )
+
+    rctx.file(
         "index.json",
         json.encode_indent(package_files),
         executable = False,

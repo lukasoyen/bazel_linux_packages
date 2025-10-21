@@ -42,10 +42,25 @@ def _has_package(lock, name, version, arch):
     key = "%s_%s_%s" % (util.sanitize(name), util.sanitize(version), arch)
     return key in lock.fast_package_lookup
 
+def _sort_sources(sources):
+    new_sources = {}
+    for key in sources:
+        if type(sources[key]) == type([]):
+            new_sources[key] = sorted(sources[key])
+        else:
+            new_sources[key] = sources[key]
+    return new_sources
+
 def _sort_input_data(input_data):
     new_input_data = {}
     for key in input_data:
-        if type(input_data[key]) == type([]):
+        if key == "sources":
+            new_sources = []
+            for source in input_data[key]:
+                new_sources.append(_sort_sources(source))
+            new_sources = sorted(new_sources, key = lambda x: x["uri"])
+            new_input_data[key] = new_sources
+        elif type(input_data[key]) == type([]):
             new_input_data[key] = sorted(input_data[key])
         else:
             new_input_data[key] = input_data[key]
@@ -81,7 +96,7 @@ def _create(rctx, lock):
 
 def _empty(rctx, input_data):
     lock = struct(
-        version = 1,
+        version = 2,
         input_data = _sort_input_data(input_data),
         packages = list(),
         fast_package_lookup = dict(),
@@ -90,8 +105,8 @@ def _empty(rctx, input_data):
 
 def _from_json(rctx, content):
     lock = json.decode(content)
-    if lock["version"] != 1:
-        fail("invalid lockfile version")
+    if lock["version"] != 2:
+        fail("Invalid lockfile version. Delete the lockfile and recreate.")
 
     lock = struct(
         version = lock["version"],

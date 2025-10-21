@@ -23,3 +23,36 @@ apt.ubuntu(
     suites = ["focal"],
 )
 use_repo(apt, "busybox_amd64", "busybox_arm64")
+
+apt.source(
+    name = "ubuntu_focal",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    suites = ["focal"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+apt.source(
+    name = "debian_bookworm",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    suites = ["bookworm"],
+    uri = "https://snapshot.debian.org/archive/debian/20250201T023325Z",
+)
+apt.download(
+    name = "busybox_mixed",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    lockfile = "//:mixed.lock.json",
+    packages = ["busybox"],
+    sources = [
+        "ubuntu_focal",
+        "debian_bookworm",
+    ],
+)
+use_repo(apt, "busybox_mixed_amd64", "busybox_mixed_arm64")

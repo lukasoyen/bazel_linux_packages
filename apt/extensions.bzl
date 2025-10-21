@@ -25,7 +25,7 @@ load("//apt/private:integrities.bzl", "INTEGRITIES")
 
 def _input_data(tag):
     values = dict()
-    for attr in ("suites", "architectures", "components", "uri", "packages"):
+    for attr in ("architectures", "packages"):
         values[attr] = getattr(tag, attr)
     return json.encode(values)
 
@@ -44,15 +44,10 @@ def _apt_extension(module_ctx):
         for cfg in mod.tags.index_integrity:
             integrity.update(cfg.integrities)
 
-        for tag in ("download", "ubuntu", "debian"):
+        for tag in ("source", "ubuntu", "debian"):
             for cfg in getattr(mod.tags, tag):
-                if cfg.fix_relative_interpreter_with_patchelf and cfg.fix_absolute_interpreter_with_patchelf:
-                    fail("Can not set both `fix_relative_interpreter_with_patchelf = True` and `fix_absolute_interpreter_with_patchelf = True` for {}".format(cfg.name))
-
-                input_data = _input_data(cfg)
-
                 deb_repository.fetch(
-                    name = cfg.name + "_repository",
+                    name = cfg.name if tag == "source" else cfg.name + "_repository",
                     integrity = integrity,
                     suites = cfg.suites,
                     architectures = cfg.architectures,
@@ -60,10 +55,17 @@ def _apt_extension(module_ctx):
                     uri = cfg.uri,
                 )
 
+        for tag in ("download", "ubuntu", "debian"):
+            for cfg in getattr(mod.tags, tag):
+                if cfg.fix_relative_interpreter_with_patchelf and cfg.fix_absolute_interpreter_with_patchelf:
+                    fail("Can not set both `fix_relative_interpreter_with_patchelf = True` and `fix_absolute_interpreter_with_patchelf = True` for {}".format(cfg.name))
+
+                input_data = _input_data(cfg)
+                sources = getattr(cfg, "sources", [cfg.name + "_repository"])
                 deb_download.index(
                     name = cfg.name + "_index",
                     apparent_name = cfg.name + "_index",
-                    source = cfg.name + "_repository",
+                    sources = sources,
                     architectures = cfg.architectures,
                     packages = cfg.packages,
                     lockfile = cfg.lockfile,
@@ -84,6 +86,7 @@ def _apt_extension(module_ctx):
                         architecture = arch,
                         lockfile = cfg.lockfile,
                         input_data = input_data,
+                        sources = sources,
                         install_name = name,
                     )
 
@@ -115,11 +118,7 @@ def _apt_extension(module_ctx):
         root_module_direct_dev_deps = root_direct_dev_deps,
     )
 
-ATTR = {
-    "name": attr.string(
-        doc = "Base name of the generated repository",
-        mandatory = True,
-    ),
+SOURCE_ATTR = {
     "suites": attr.string_list(
         doc = "Deb suites to download the packages from (see DEB822)",
         mandatory = True,
@@ -131,6 +130,13 @@ ATTR = {
     "components": attr.string_list(
         doc = "Deb components to download the packages from (see DEB822)",
         default = ["main"],
+    ),
+}
+
+INSTALL_ATTR = {
+    "name": attr.string(
+        doc = "Base name of the generated repository",
+        mandatory = True,
     ),
     "packages": attr.string_list(
         doc = "Packages to download",
@@ -224,7 +230,7 @@ ATTR = {
     ),
 }
 
-DOC = """
+INSTALL_DOC = """
 Download/extract a set of `packages` from the Ubuntu/Debian repositories.
 
 The packages are only extracted, no install hooks will be executed.
@@ -235,6 +241,10 @@ The `lockfile` attribute is mandatory, but does not need to exist during the
 initial setup. If the attribute is set to a non-existing file a mostly empty
 repository that only exposes the target to copy the lockfile into the
 workspace is created.
+"""
+
+SOURCE_DOC = """
+Define a Debian/Ubuntu repository to download from.
 
 The `suites`, `architectures`, `components`, `uri` parameters roughly follow
 [DEB822](https://manpages.debian.org/unstable/apt/sources.list.5.en.html#DEB822-STYLE_FORMAT).
@@ -282,18 +292,34 @@ index_integrity = tag_class(
     },
 )
 
-download = tag_class(
-    doc = DOC.format(tag = "download"),
-    attrs = ATTR | {
+source = tag_class(
+    doc = SOURCE_DOC.format(tag = "source"),
+    attrs = SOURCE_ATTR | {
+        "name": attr.string(
+            doc = "Name of the generated repository",
+            mandatory = True,
+        ),
         "uri": attr.string(
             doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
             mandatory = True,
         ),
     },
 )
+download = tag_class(
+    doc = INSTALL_DOC,
+    attrs = INSTALL_ATTR | {
+        "sources": attr.string_list(
+            doc = "Names of source() repositories to download packages from",
+            mandatory = True,
+        ),
+        "architectures": attr.string_list(
+            doc = "Architectures for which to create the install (defaults to architectures from `sources` if not given)",
+        ),
+    },
+)
 ubuntu = tag_class(
-    doc = DOC.format(tag = "ubuntu"),
-    attrs = ATTR | {
+    doc = INSTALL_DOC + "" + SOURCE_DOC.format(tag = "ubuntu"),
+    attrs = INSTALL_ATTR | SOURCE_ATTR | {
         "uri": attr.string(
             doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
             default = DEFAULT_UBUNTU_URL,
@@ -301,8 +327,8 @@ ubuntu = tag_class(
     },
 )
 debian = tag_class(
-    doc = DOC.format(tag = "debian"),
-    attrs = ATTR | {
+    doc = INSTALL_DOC + "" + SOURCE_DOC.format(tag = "debian"),
+    attrs = INSTALL_ATTR | SOURCE_ATTR | {
         "uri": attr.string(
             doc = "Deb mirror to download the packages from (see URIs in DEB822 but only allows what basel supports)",
             default = DEFAULT_DEBIAN_URL,
@@ -314,6 +340,7 @@ apt = module_extension(
     implementation = _apt_extension,
     tag_classes = {
         "index_integrity": index_integrity,
+        "source": source,
         "download": download,
         "ubuntu": ubuntu,
         "debian": debian,

@@ -110,7 +110,7 @@ _test_arch = "amd64"
 
 def _make_index():
     idx = deb_repository.new()
-    resolution = dependency_resolver.new(idx)
+    resolution = dependency_resolver.new([idx])
 
     def _add_package(idx, **kwargs):
         kwargs["architecture"] = kwargs.get("architecture", _test_arch)
