@@ -3,7 +3,7 @@
 load(":version.bzl", version_lib = "version")
 load(":version_constraint.bzl", "version_constraint")
 
-def _resolve_package(state, name, version, arch):
+def _resolve_package(state, name, version, arch, requested_packages):
     # First check if the constraint is satisfied by a virtual package
     virtual_packages = state.repository.virtual_packages(name = name, arch = arch)
 
@@ -32,6 +32,11 @@ def _resolve_package(state, name, version, arch):
             #
             # In the case of required packages, these defaults are not specified.
             if "Priority" in package and package["Priority"] == "required":
+                return package
+
+        for package in candidates:
+            # Chooses a candidate if it is already among the requested packages
+            if package["Package"] in requested_packages:
                 return package
 
         # Otherwise, we can't disambiguate the virtual package providers so
@@ -75,7 +80,7 @@ _ITERATION_MAX_ = 2147483646
 # For future: unfortunately this function uses a few state variables to track
 # certain conditions and package dependency groups.
 # TODO: Try to simplify it in the future.
-def _resolve_all(state, name, version, arch, include_transitive = True):
+def _resolve_all(state, name, version, arch, requested_packages, include_transitive = True):
     root_package = None
     unmet_dependencies = []
     dependencies = []
@@ -97,7 +102,7 @@ def _resolve_all(state, name, version, arch, include_transitive = True):
         if dependency_group_idx > -1 and dependency_group[dependency_group_idx][0]:
             continue
 
-        package = _resolve_package(state, name, version, arch)
+        package = _resolve_package(state, name, version, arch, requested_packages)
 
         # If this package is not found and is part of a dependency group, then just skip it.
         if not package and dependency_group_idx > -1:
