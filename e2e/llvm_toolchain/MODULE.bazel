@@ -1,7 +1,7 @@
 bazel_dep(name = "bazel_linux_packages", version = "0.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "toolchains_llvm", version = "1.5.0")
-bazel_dep(name = "rules_cc", version = "0.1.4")
+bazel_dep(name = "rules_cc", version = "0.2.11")
 
 local_path_override(
     module_name = "bazel_linux_packages",
