@@ -177,7 +177,7 @@ def _deb_download_impl(rctx):
         )
     else:
         lockf = lockfile.from_json(rctx, rctx.read(rctx.attr.lockfile))
-        if lockf.input_data() != json.decode(rctx.attr.input_data):
+        if not lockf.input_data_equals(json.decode(rctx.attr.input_data)):
             util.warning(
                 rctx,
                 "Lockfiles need to be recreated. Please run:\n" + lock_cmd,

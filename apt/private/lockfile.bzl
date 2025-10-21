@@ -42,33 +42,47 @@ def _has_package(lock, name, version, arch):
     key = "%s_%s_%s" % (util.sanitize(name), util.sanitize(version), arch)
     return key in lock.fast_package_lookup
 
+def _sort_input_data(input_data):
+    new_input_data = {}
+    for key in input_data:
+        if type(input_data[key]) == type([]):
+            new_input_data[key] = sorted(input_data[key])
+        else:
+            new_input_data[key] = input_data[key]
+    return new_input_data
+
+def _sort_packages(packages):
+    for p in packages:
+        p["dependencies"] = sorted(p["dependencies"], key = lambda x: x["key"])
+    return sorted(packages, key = lambda x: x["key"])
+
 def _create(rctx, lock):
     return struct(
         has_package = lambda *args, **kwargs: _has_package(lock, *args, **kwargs),
         add_package = lambda *args, **kwargs: _add_package(lock, *args, **kwargs),
         add_package_dependency = lambda *args, **kwargs: _add_package_dependency(lock, *args, **kwargs),
         packages = lambda: lock.packages,
-        input_data = lambda: lock.input_data,
+        input_data_equals = lambda new_input_data: lock.input_data == _sort_input_data(new_input_data),
         write = lambda out: rctx.file(
             out,
             json.encode_indent(struct(
                 version = lock.version,
-                input_data = lock.input_data,
-                packages = lock.packages,
+                input_data = _sort_input_data(lock.input_data),
+                packages = _sort_packages(lock.packages),
             )),
             executable = False,
         ),
         as_json = lambda: json.encode_indent(struct(
             version = lock.version,
-            input_data = lock.input_data,
-            packages = lock.packages,
+            input_data = _sort_input_data(lock.input_data),
+            packages = _sort_packages(lock.packages),
         )),
     )
 
 def _empty(rctx, input_data):
     lock = struct(
         version = 1,
-        input_data = input_data,
+        input_data = _sort_input_data(input_data),
         packages = list(),
         fast_package_lookup = dict(),
     )
@@ -81,8 +95,8 @@ def _from_json(rctx, content):
 
     lock = struct(
         version = lock["version"],
-        input_data = lock.get("input_data", {}),
-        packages = lock["packages"],
+        input_data = _sort_input_data(lock.get("input_data", {})),
+        packages = _sort_packages(lock["packages"]),
         fast_package_lookup = dict(),
     )
     for (i, package) in enumerate(lock.packages):
