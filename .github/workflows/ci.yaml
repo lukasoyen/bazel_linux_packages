@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04"]
-        bazelversion: [7.6.1, 8.3.1]
+        bazelversion: [7.6.1, 8.4.2]
         folder: [".", "e2e/smoke", "e2e/llvm_toolchain", "e2e/systemd", "e2e/toolchains"]
         include:
           - os: "ubuntu-22.04-arm"
@@ -48,6 +48,10 @@ jobs:
         run: |
           ldd --version
           bazel test //...
+      - name: Test docs extensions
+        if: matrix.bazelversion == '8.4.2' && matrix.folder == '.'
+        run: |
+          bazel test //docs:update_tests
   package:
     runs-on: ubuntu-latest
     needs: [test, pre-commit]
