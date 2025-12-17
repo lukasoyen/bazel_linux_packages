@@ -1,6 +1,6 @@
 bazel_dep(name = "bazel_linux_packages", version = "0.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "rules_cc", version = "0.2.15")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_platform", version = "0.1.0")
 
