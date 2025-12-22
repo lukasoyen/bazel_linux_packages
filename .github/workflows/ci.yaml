@@ -29,7 +29,7 @@ jobs:
             folder: "e2e/smoke"
     steps:
       - uses: actions/checkout@v6
-      - uses: bazel-contrib/setup-bazel@0.15.0
+      - uses: bazel-contrib/setup-bazel@0.16.0
         with:
           repository-cache: true
           bazelrc: |
