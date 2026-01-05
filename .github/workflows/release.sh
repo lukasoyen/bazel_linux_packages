@@ -27,6 +27,14 @@ bazel_dep(name = "bazel_linux_packages", version = "${TAG}")
 \`\`\`
 EOF
 
+docs="$(mktemp -d)"
+targets="$(mktemp)"
+bazel --output_base="$docs" query --output=label --output_file="$targets" 'kind("starlark_doc_extract rule", //...)'
+bazel --output_base="$docs" build --target_pattern_file="$targets"
+tar --create --auto-compress \
+    --directory "$(bazel --output_base="$docs" info bazel-bin)" \
+    --file "${PREFIX}.docs.tar.gz" .
+
 tar xf "${PREFIX}.tar.zst"
 
 (
