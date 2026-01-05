@@ -26,8 +26,7 @@ repos:
       - id: end-of-file-fixer
         exclude: |
           (?x)^(
-            docs/
-            |.*lock.json
+            .*lock.json
             |.*/expected_manifest.*.json
           )
       - id: trailing-whitespace
