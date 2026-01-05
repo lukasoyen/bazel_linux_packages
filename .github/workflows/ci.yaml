@@ -78,6 +78,8 @@ jobs:
     with:
       tag_name: ${{ github.ref_name }}
       registry_fork: lukasoyen/bazel-central-registry
+      open_pull_request: false
+      attest: false
     permissions:
       contents: write
     secrets:
