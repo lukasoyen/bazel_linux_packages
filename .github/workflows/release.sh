@@ -9,13 +9,7 @@ readonly PREFIX="${2//[\/]/-}" # in case of a merge this contains merge/XX, so r
 readonly RELEASE_NOTES="$3"
 
 # NB: configuration for 'git archive' is in /.gitattributes
-git archive --format=tar --prefix="${PREFIX}/" HEAD | zstd --compress -15 -f -q -o "${PREFIX}.tar.zst"
-git archive --format=tar --prefix="${PREFIX}/" HEAD | xz --compress -9 -q > "${PREFIX}.tar.xz"
-
-ls -l "${PREFIX}.tar.zst"
-tar tf "${PREFIX}.tar.zst"
-ls -l "${PREFIX}.tar.xz"
-tar tf "${PREFIX}.tar.xz"
+git archive --format=tar.gz --prefix="${PREFIX}/" HEAD > "${PREFIX}.tar.gz"
 
 cat > "${RELEASE_NOTES}" << EOF
 ## Using with Bazel 8.1 or greater
@@ -35,7 +29,11 @@ tar --create --auto-compress \
     --directory "$(bazel --output_base="$docs" info bazel-bin)" \
     --file "${PREFIX}.docs.tar.gz" .
 
-tar xf "${PREFIX}.tar.zst"
+ls -l "${PREFIX}.tar.gz" "${PREFIX}.docs.tar.gz"
+tar tf "${PREFIX}.tar.gz"
+tar tf "${PREFIX}.docs.tar.gz"
+
+tar xf "${PREFIX}.tar.gz"
 
 (
     pushd "${PREFIX}/e2e/smoke"
