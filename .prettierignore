@@ -1,4 +1,3 @@
-docs/*.md
 *.yaml
 *.lock.json
 expected_manifest*.json

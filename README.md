@@ -25,12 +25,7 @@ apt.ubuntu(
 use_repo(apt, "busybox")
 ```
 
-See [e2e/](e2e/README.md) for end to end tests and
-[the extension docs](docs/extensions.md) for more details:
-
-- [`apt.download()`](docs/extensions.md#download)
-- [`apt.ubuntu()`](docs/extensions.md#ubuntu)
-- [`apt.debian()`](docs/extensions.md#debian)
+See [e2e/](e2e/README.md) for end to end tests and the extension docs on BCR for more details:
 
 ## Handle Library Paths
 
@@ -40,10 +35,9 @@ See [e2e/](e2e/README.md) for end to end tests and
   incompatibilities can result in errors. The created repository will contain
   the correct `glibc` version. There are two strategies to handle these:
 
-  1. Set [`fix_rpath_with_patchelf = True`](docs/extensions.md#apt.install-fix_rpath_with_patchelf) for
-     [`apt.download()`](docs/extensions.md#download). This will use
-     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables
-     and binaries to add library search directories to `RUNPATH`. See also
+  1. Set `fix_rpath_with_patchelf = True` for `apt.download()`. This will use
+     [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables and
+     binaries to add library search directories to `RUNPATH`. See also
      `fix_absolute_interpreter_with_patchelf`,
      `fix_relative_interpreter_with_patchelf`, and `extra_patchelf_dirs`.
   2. The systems' loader will be used to load required libraries and will search

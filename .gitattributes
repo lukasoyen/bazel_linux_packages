@@ -1,6 +1,3 @@
-# In code review, collapse generated files
-docs/*.md linguist-generated=true
-
 # Control which files end up in a release with `git archive`
 .* export-ignore
 e2e/README.md export-ignore

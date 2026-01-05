@@ -48,10 +48,6 @@ jobs:
         run: |
           ldd --version
           bazel test //...
-      - name: Test docs extensions
-        if: matrix.bazelversion == '8.5.0' && matrix.folder == '.'
-        run: |
-          bazel test //docs:update_tests
   package:
     runs-on: ubuntu-latest
     needs: [test, pre-commit]
