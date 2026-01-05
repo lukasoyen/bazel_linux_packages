@@ -9,7 +9,8 @@ module(
 
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.1")
-bazel_dep(name = "aspect_bazel_lib", version = "2.20.0")
+bazel_dep(name = "bazel_lib", version = "3.1.0")
+bazel_dep(name = "jq.bzl", version = "0.4.0")
 
 deb_archive = use_repo_rule("//internal:deb.bzl", "deb_archive")
 
@@ -41,7 +42,7 @@ http_archive(
     urls = ["https://github.com/NixOS/patchelf/releases/download/0.16.1/patchelf-0.16.1-aarch64.tar.gz"],
 )
 
-bazel_lib_toolchains = use_extension("@aspect_bazel_lib//lib:extensions.bzl", "toolchains")
+bazel_lib_toolchains = use_extension("@bazel_lib//lib:extensions.bzl", "toolchains")
 use_repo(bazel_lib_toolchains, "zstd_linux_amd64")
 use_repo(bazel_lib_toolchains, "zstd_linux_arm64")
 
