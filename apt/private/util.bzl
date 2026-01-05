@@ -1,6 +1,6 @@
 "utilities"
 
-load("@aspect_bazel_lib//lib:repo_utils.bzl", "repo_utils")
+load("@bazel_lib//lib:repo_utils.bzl", "repo_utils")
 
 def _set_dict(struct, value = None, keys = []):
     klen = len(keys)
