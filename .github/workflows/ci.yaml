@@ -73,7 +73,7 @@ jobs:
             ${{ env.prefix }}.tar.zst
             ${{ env.prefix }}.tar.xz
   publish:
-    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@1.1.0
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.1.0
     if: startsWith(github.ref, 'refs/tags/')
     with:
       tag_name: ${{ github.ref_name }}
