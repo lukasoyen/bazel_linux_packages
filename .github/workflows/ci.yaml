@@ -71,6 +71,7 @@ jobs:
             ${{ env.prefix }}.docs.tar.gz
   publish:
     uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v1.1.0
+    needs: [package]
     if: startsWith(github.ref, 'refs/tags/')
     with:
       tag_name: ${{ github.ref_name }}
