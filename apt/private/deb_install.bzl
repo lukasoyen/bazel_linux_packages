@@ -91,6 +91,8 @@ def _fixup_rpath(rctx, patchelf, path, lib_paths):
             return
         if "patchelf: wrong ELF type" in result.stderr:
             return
+        if "patchelf: missing ELF header" in result.stderr:
+            return
         fail("Failed to add RPATH: {} ({}, {}, {})".format(
             " ".join(cmd),
             result.return_code,
