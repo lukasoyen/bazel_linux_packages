@@ -146,6 +146,8 @@ def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, 
         seen[interpreter.removeprefix(pwd)] = True
 
         if fix_relative_interpreter:
+            # This is the interpreter path as it appears under Bazel's external repo layout.
+            # buildifier: disable=external-path
             interpreter_path = "./external/{}/{}".format(rctx.attr.name, interpreter.removeprefix(pwd))
         if fix_absolute_interpreter:
             interpreter_path = interpreter

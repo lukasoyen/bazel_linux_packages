@@ -56,6 +56,8 @@ def _get_input_data_with_sources(rctx):
     return input_data
 
 _INDEX_BUILD_TMPL = """
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+
 filegroup(
     name = "lockfile",
     srcs = ["lock.json"],
@@ -177,6 +179,8 @@ def _extract_packages(rctx, lockf):
         if arch not in data_files:
             data_files[arch] = []
 
+        # The label is written to JSON and later read from another repo mapping context.
+        # buildifier: disable=canonical-repository
         data_files[arch].append("@@{}//:{}".format(rctx.name, path))
     return data_files
 

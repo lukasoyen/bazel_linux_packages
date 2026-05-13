@@ -194,6 +194,9 @@ def _fetch_impl(rctx):
                 rctx.report_progress("Fetching package index: {}/{} for {}".format(dist, comp, arch))
                 (output, updates) = _fetch_package_index(rctx, uri, dist, comp, arch, rctx.attr.integrity)
                 integrity.update(updates)
+
+                # The label is written to JSON and later read from another repo mapping context.
+                # buildifier: disable=canonical-repository
                 package_files["@@{}//:{}".format(rctx.name, output)] = uri
 
     updated_integrity = _new_integrities(rctx.attr.integrity, integrity)
