@@ -226,7 +226,7 @@ def _deb_install_impl(rctx):
             "{target_name}": rctx.attr.source,
             "{glob_pattern}": ", ".join([repr(p) for p in rctx.attr.glob_pattern]),
             "{glob_excludes}": ", ".join([repr(p) for p in rctx.attr.glob_excludes]),
-        },
+        } | rctx.attr.build_file_substitutions,
         executable = False,
     )
 
@@ -243,6 +243,7 @@ deb_install = repository_rule(
         "add_files": attr.string_keyed_label_dict(mandatory = True),
         "post_install_cmd": attr.string_list_dict(mandatory = True),
         "build_file": attr.label(mandatory = True),
+        "build_file_substitutions": attr.string_dict(mandatory = True),
         "glob_pattern": attr.string_list(mandatory = True),
         "glob_excludes": attr.string_list(mandatory = True),
     },
