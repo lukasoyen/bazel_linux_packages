@@ -1,0 +1,13 @@
+"""Custom template used to exercise build_file_substitutions."""
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "{custom_alias}",
+    actual = "lib/systemd/systemd",
+)
+
+alias(
+    name = "manifest",
+    actual = "install_manifest.json",
+)

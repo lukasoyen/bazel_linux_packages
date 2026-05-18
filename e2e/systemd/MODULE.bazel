@@ -15,6 +15,8 @@ apt = use_extension(
 apt.debian(
     name = "systemd",
     architectures = ["amd64"],
+    build_file = "//:custom.BUILD.bazel.tmpl",
+    build_file_substitutions = {"{custom_alias}": "test_alias"},
     glob_excludes = [
         "usr/share/man/**",
         "**/*cryptsetup.slice",
