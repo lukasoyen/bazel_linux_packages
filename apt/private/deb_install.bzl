@@ -110,6 +110,8 @@ def _fixup_interpreter(rctx, patchelf, path, interpreter):
             return
         if "patchelf: wrong ELF type" in result.stderr:
             return
+        if "patchelf: missing ELF header" in result.stderr:
+            return
         fail("Failed to set interpreter: {} ({}, {}, {})".format(
             " ".join(cmd),
             result.return_code,
