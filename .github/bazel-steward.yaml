@@ -1,4 +1,6 @@
 update-rules:
+  - kinds: bazel
+    enabled: false
   - kinds: maven
     enabled: false
   - kinds: bazel-rules
