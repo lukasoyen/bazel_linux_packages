@@ -4,6 +4,7 @@ module(
     name = "bazel_linux_packages",
     version = "0.0.0",
     bazel_compatibility = [">=7.7.1"],
+    compatibility_level = 1,
 )
 
 bazel_dep(name = "platforms", version = "1.0.0")
