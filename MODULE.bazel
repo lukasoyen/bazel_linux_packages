@@ -70,8 +70,9 @@ index_integrities(
         "jammy",
         "noble",
         "oracular",
+        "resolute",
     ],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+    uri = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z",
 )
 
 index_integrities(

@@ -31,7 +31,7 @@ def _input_data(tag):
 
 # Whenever these URLs are updated, please also update the `index_integrities()` in
 # `MODULE.bazel` and run `bazel run //:update_index_integrities`.
-DEFAULT_UBUNTU_URL = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z"
+DEFAULT_UBUNTU_URL = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z"
 DEFAULT_DEBIAN_URL = "https://snapshot.debian.org/archive/debian/20250201T023325Z"
 
 def _apt_extension(module_ctx):
