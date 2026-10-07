@@ -24,6 +24,18 @@ apt.ubuntu(
 )
 use_repo(apt, "busybox_amd64", "busybox_arm64")
 
+apt.ubuntu(
+    name = "busybox_resolute",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    lockfile = "//:resolute.lock.json",
+    packages = ["busybox-static"],
+    suites = ["resolute"],
+)
+use_repo(apt, "busybox_resolute_amd64", "busybox_resolute_arm64")
+
 apt.source(
     name = "ubuntu_focal",
     architectures = [
