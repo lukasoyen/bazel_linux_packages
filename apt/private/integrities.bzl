@@ -22,4 +22,8 @@ INTEGRITIES = {
     "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/oracular/main/binary-arm64/Packages.xz": "sha256-zqCVNUadbGa2mrrmTjiTQNLGRBZ3rJ1v/EA4+iraKRw=",
     "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/oracular/universe/binary-amd64/Packages.xz": "sha256-zbVv2+qgHh5IXdQgPCoI3BOTNIc7QOd277uvu6bsuOk=",
     "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z/dists/oracular/universe/binary-arm64/Packages.xz": "sha256-TtulJOQcfsoCl2SnoSDL5g37DqmPNLmSYC15Bhf+uT0=",
+    "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z/dists/resolute/main/binary-amd64/Packages.xz": "sha256-7ZrEHLJj767MWgagdC3FZXDi+1/5TE8uSy+9zd1zzyQ=",
+    "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z/dists/resolute/main/binary-arm64/Packages.xz": "sha256-U3cVgX2e13zJGfUSPtuRpI2a6Xq/BViKjxggjMcifgg=",
+    "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z/dists/resolute/universe/binary-amd64/Packages.xz": "sha256-FYe+htZtOFQjJSFeDhCfdb1pXI8k15Os4nYgOKatWB4=",
+    "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z/dists/resolute/universe/binary-arm64/Packages.xz": "sha256-CmjCJHh3PZaB4JijoeZQRkqnB8SlV7TDAgZ42S37U8A=",
 }
