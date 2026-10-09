@@ -70,8 +70,23 @@ index_integrities(
         "jammy",
         "noble",
         "oracular",
-        "resolute",
     ],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
+)
+
+# Resolute requires a newer snapshot than the default Ubuntu repositories.
+index_integrities(
+    name = "ubuntu_resolute_integrities",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    components = [
+        "main",
+        "universe",
+    ],
+    dev_dependency = True,
+    suites = ["resolute"],
     uri = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z",
 )
 

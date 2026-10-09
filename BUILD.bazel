@@ -17,13 +17,14 @@ jq(
     srcs = [
         "@debian_integrities//:integrity.json",
         "@ubuntu_integrities//:integrity.json",
+        "@ubuntu_resolute_integrities//:integrity.json",
     ],
     out = "index_integrities.json",
     args = [
         "--slurp",
         "--raw-output",
     ],
-    filter = '"\\"\\"\\"Generated index integrities.\\"\\"\\"\\nINTEGRITIES = \\(.[0] * .[1])"',
+    filter = '"\\"\\"\\"Generated index integrities.\\"\\"\\"\\nINTEGRITIES = \\(add)"',
 )
 
 write_source_files(

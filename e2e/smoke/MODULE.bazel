@@ -33,6 +33,7 @@ apt.ubuntu(
     lockfile = "//:resolute.lock.json",
     packages = ["busybox-static"],
     suites = ["resolute"],
+    uri = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z",
 )
 use_repo(apt, "busybox_resolute_amd64", "busybox_resolute_arm64")
 
@@ -43,7 +44,7 @@ apt.source(
         "arm64",
     ],
     suites = ["focal"],
-    uri = "https://snapshot.ubuntu.com/ubuntu/20261001T000000Z",
+    uri = "https://snapshot.ubuntu.com/ubuntu/20250219T154000Z",
 )
 apt.source(
     name = "debian_bookworm",
