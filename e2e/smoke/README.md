@@ -17,3 +17,18 @@ Recreate the lockfiles with:
 bazel run @busybox_amd64//:lock
 bazel run @busybox_resolute_amd64//:lock
 ```
+
+## Repository contents cache
+
+On Linux with Bazel 9 or newer, run the additional cache test from this directory:
+
+```sh
+python3 repo_contents_cache_test.py
+```
+
+It uses the Focal BusyBox fixture with independent output bases and a shared
+contents cache. Package archives are removed from the download cache and downloads
+are disabled to verify reuse. The test also checks lockfile invalidation and
+configurations that must remain uncached.
+
+CI runs this after `bazel test //...` in the Bazel 9 and 10 smoke jobs.

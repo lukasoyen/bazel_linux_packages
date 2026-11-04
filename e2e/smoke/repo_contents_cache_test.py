@@ -13,7 +13,8 @@ import subprocess
 import tempfile
 
 
-REPO = Path(__file__).resolve().parents[1]
+SMOKE = Path(__file__).resolve().parent
+REPO = SMOKE.parents[1]
 
 
 def run_bazel(workspace, output_base, downloads, contents, expression, offline=False):
@@ -64,8 +65,10 @@ def main():
         first = root / "first"
         second = root / "second"
         lockfile = workspace / "focal.lock.json"
-        shutil.copyfile(REPO / "e2e/smoke/focal.lock.json", lockfile)
-        shutil.copyfile(REPO / ".bazelversion", workspace / ".bazelversion")
+        shutil.copyfile(SMOKE / "focal.lock.json", lockfile)
+        # CI selects its matrix version here; release archives omit dotfiles.
+        if (SMOKE / ".bazelversion").exists():
+            shutil.copyfile(SMOKE / ".bazelversion", workspace / ".bazelversion")
         (workspace / "BUILD.bazel").write_text('exports_files(["extra.txt"])\n')
         (workspace / "extra.txt").write_text("extra file\n")
         unverified = json.loads(lockfile.read_text())
