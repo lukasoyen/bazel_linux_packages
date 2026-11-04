@@ -232,6 +232,16 @@ def _deb_install_impl(rctx):
         executable = False,
     )
 
+    if hasattr(rctx, "repo_metadata"):
+        # These options can depend on the host architecture, embed the repository's
+        # absolute path, or run arbitrary commands. Cache plain sysroots only.
+        return rctx.repo_metadata(reproducible = not (
+            rctx.attr.fix_rpath_with_patchelf or
+            rctx.attr.add_files or
+            rctx.attr.post_install_cmd
+        ))
+    return None
+
 deb_install = repository_rule(
     implementation = _deb_install_impl,
     attrs = {

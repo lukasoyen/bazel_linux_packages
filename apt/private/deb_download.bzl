@@ -111,6 +111,10 @@ def _deb_index_impl(rctx):
         executable = False,
     )
 
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
+    return None
+
 _BUILD_TMPL = """
 alias(
     name="lock",
@@ -186,6 +190,7 @@ def _extract_packages(rctx, lockf):
 
 def _deb_download_impl(rctx):
     data_files = []
+    reproducible = True
 
     # Ensure the repository gets restarted once the lockfile exists.
     rctx.watch(rctx.attr.lockfile)
@@ -205,6 +210,11 @@ def _deb_download_impl(rctx):
             )
         else:
             data_files = _extract_packages(rctx, lockf)
+            reproducible = all([
+                bool(package["sha256"])
+                for package in lockf.packages()
+                if package["arch"] == rctx.attr.architecture
+            ])
 
     rctx.file(
         "index.json",
@@ -216,6 +226,10 @@ def _deb_download_impl(rctx):
         _BUILD_TMPL.format(rctx.attr.index),
         executable = False,
     )
+
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = reproducible)
+    return None
 
 _deb_index = repository_rule(
     implementation = _deb_index_impl,

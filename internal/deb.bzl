@@ -13,6 +13,10 @@ def _deb_archive_impl(rctx):
 
     rctx.file("BUILD.bazel", "exports_files(['usr/bin/busybox'])")
 
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = bool(rctx.attr.integrity))
+    return None
+
 deb_archive = repository_rule(
     implementation = _deb_archive_impl,
     attrs = {
