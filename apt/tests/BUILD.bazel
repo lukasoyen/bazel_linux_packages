@@ -1,6 +1,9 @@
+load(":download_test.bzl", "download_tests")
 load(":resolution_test.bzl", "resolution_tests")
 load(":version_test.bzl", "version_tests")
 
 version_tests()
 
 resolution_tests()
+
+download_tests()
