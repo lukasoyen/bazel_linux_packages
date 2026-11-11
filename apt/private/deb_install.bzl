@@ -131,7 +131,34 @@ def _find_interpreter(rctx, busybox, arch):
         return str(rctx.path(path).realpath)
     return None
 
-def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, fix_absolute_interpreter):
+def _run(rctx, *cmd):
+    result = rctx.execute(list(cmd))
+    if result.return_code:
+        fail("Failed to run: {} ({}, {}, {})".format(
+            " ".join(cmd),
+            result.return_code,
+            result.stdout,
+            result.stderr,
+        ))
+    return result.stdout
+
+def _share_interpreter(rctx, busybox, interpreter):
+    # Repositories live in <output_user_root>/<output_base>/external/<name>.
+    root = rctx.path(".").realpath.dirname.dirname.dirname
+    digest = _run(rctx, busybox, "sha256sum", interpreter).split(" ")[0]
+    shared_dir = "{}/bazel_linux_packages/{}".format(root, digest)
+    shared_interpreter = "{}/{}".format(shared_dir, rctx.path(interpreter).basename)
+
+    if rctx.execute([busybox, "cmp", "-s", interpreter, shared_interpreter]).return_code:
+        # Copy into the repository first, so the rename publishes a complete file.
+        _run(rctx, busybox, "mkdir", "-p", shared_dir)
+        _run(rctx, busybox, "cp", interpreter, "_shared_interpreter")
+        _run(rctx, busybox, "mv", "-f", "_shared_interpreter", shared_interpreter)
+
+    rctx.watch(shared_interpreter)
+    return shared_interpreter
+
+def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, fix_absolute_interpreter, fix_shared_interpreter):
     rctx.report_progress("Fixing executable and libraries")
     pwd = str(rctx.path(".").realpath) + "/"
 
@@ -153,6 +180,8 @@ def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, 
             interpreter_path = "./external/{}/{}".format(rctx.attr.name, interpreter.removeprefix(pwd))
         if fix_absolute_interpreter:
             interpreter_path = interpreter
+        if fix_shared_interpreter:
+            interpreter_path = _share_interpreter(rctx, busybox, interpreter)
 
     for directory in rctx.attr.patchelf_dirs:
         for path in _list_files(rctx, busybox, directory.format(arch = arch), "-maxdepth", "1"):
@@ -163,10 +192,13 @@ def _fixup_executables(rctx, arch, busybox, patchelf, fix_relative_interpreter, 
                     _fixup_interpreter(rctx, patchelf, realpath, interpreter_path)
                 seen[realpath] = True
 
+    return interpreter_path
+
 def _deb_install_impl(rctx):
     busybox = util.get_host_tool(rctx, "busybox", "bin/busybox")
     patchelf = util.get_host_tool(rctx, "patchelf", "bin/patchelf")
     index = json.decode(rctx.read(util.get_repo_path(rctx, rctx.attr.source, "index.json")))
+    interpreter_path = None
 
     # otherwise assume we are in the initial lockfile generation
     if index:
@@ -186,13 +218,14 @@ def _deb_install_impl(rctx):
             manifest["{}".format(label.name)] = _list_for_manifest(rctx, busybox, path)
 
         if rctx.attr.fix_rpath_with_patchelf:
-            _fixup_executables(
+            interpreter_path = _fixup_executables(
                 rctx,
                 arch,
                 busybox,
                 patchelf,
                 rctx.attr.fix_relative_interpreter_with_patchelf,
                 rctx.attr.fix_absolute_interpreter_with_patchelf,
+                rctx.attr.fix_shared_interpreter_with_patchelf,
             )
 
         for (path, label) in rctx.attr.add_files.items():
@@ -215,11 +248,10 @@ def _deb_install_impl(rctx):
             executable = False,
         )
 
-    rctx.file(
-        "defs.bzl",
-        'def with_repository_prefix(path): return "external/{}/{{}}".format(path)'.format(rctx.attr.name),
-        executable = False,
-    )
+    defs = 'def with_repository_prefix(path): return "external/{}/{{}}".format(path)\n'.format(rctx.attr.name)
+    if rctx.attr.fix_shared_interpreter_with_patchelf:
+        defs += "INTERPRETER = {}\n".format(repr(interpreter_path))
+    rctx.file("defs.bzl", defs, executable = False)
 
     rctx.template(
         "BUILD.bazel",
@@ -241,6 +273,7 @@ deb_install = repository_rule(
         "fix_rpath_with_patchelf": attr.bool(mandatory = True),
         "fix_relative_interpreter_with_patchelf": attr.bool(mandatory = True),
         "fix_absolute_interpreter_with_patchelf": attr.bool(mandatory = True),
+        "fix_shared_interpreter_with_patchelf": attr.bool(mandatory = True),
         "patchelf_dirs": attr.string_list(mandatory = True),
         "add_files": attr.string_keyed_label_dict(mandatory = True),
         "post_install_cmd": attr.string_list_dict(mandatory = True),

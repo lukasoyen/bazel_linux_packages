@@ -57,8 +57,8 @@ def _apt_extension(module_ctx):
 
         for tag in ("download", "ubuntu", "debian"):
             for cfg in getattr(mod.tags, tag):
-                if cfg.fix_relative_interpreter_with_patchelf and cfg.fix_absolute_interpreter_with_patchelf:
-                    fail("Can not set both `fix_relative_interpreter_with_patchelf = True` and `fix_absolute_interpreter_with_patchelf = True` for {}".format(cfg.name))
+                if int(cfg.fix_relative_interpreter_with_patchelf) + int(cfg.fix_absolute_interpreter_with_patchelf) + int(cfg.fix_shared_interpreter_with_patchelf) > 1:
+                    fail("Can only set one of `fix_relative_interpreter_with_patchelf = True`, `fix_absolute_interpreter_with_patchelf = True` and `fix_shared_interpreter_with_patchelf = True` for {}".format(cfg.name))
 
                 input_data = _input_data(cfg)
                 sources = getattr(cfg, "sources", [cfg.name + "_repository"])
@@ -98,6 +98,7 @@ def _apt_extension(module_ctx):
                         fix_rpath_with_patchelf = cfg.fix_rpath_with_patchelf,
                         fix_relative_interpreter_with_patchelf = cfg.fix_relative_interpreter_with_patchelf,
                         fix_absolute_interpreter_with_patchelf = cfg.fix_absolute_interpreter_with_patchelf,
+                        fix_shared_interpreter_with_patchelf = cfg.fix_shared_interpreter_with_patchelf,
                         patchelf_dirs = cfg.patchelf_dirs + cfg.extra_patchelf_dirs,
                         add_files = cfg.add_files,
                         post_install_cmd = cfg.post_install_cmd,
@@ -160,7 +161,7 @@ INSTALL_ATTR = {
             Whether to fix the interpreter of executables using `patchelf`
 
             Only has an effect if `fix_rpath_with_patchelf` is set to `True`.
-            Mutually exclusive with `fix_absolute_interpreter_with_patchelf`.
+            Mutually exclusive with `fix_absolute_interpreter_with_patchelf` and `fix_shared_interpreter_with_patchelf`.
             """,
         default = False,
     ),
@@ -169,10 +170,25 @@ INSTALL_ATTR = {
             Whether to absolutize the interpreter while fixing executables/libraries using `patchelf`
 
             Only has an effect if `fix_rpath_with_patchelf` is set to `True`.
-            Mutually exclusive with `fix_relative_interpreter_with_patchelf`.
+            Mutually exclusive with `fix_relative_interpreter_with_patchelf` and `fix_shared_interpreter_with_patchelf`.
 
             Note that this will destroy remote-executability and cache-reuse across different systems
             if the path to the source/build directory is not exactly the same.
+            """,
+        default = False,
+    ),
+    "fix_shared_interpreter_with_patchelf": attr.bool(
+        doc = """
+            Whether to point the interpreter at a copy shared by all output bases using `patchelf`
+
+            The copy is kept in `bazel_linux_packages/` next to the output bases and restored if deleted.
+            The generated `defs.bzl` exports its path as `INTERPRETER` to link binaries against it.
+
+            Only has an effect if `fix_rpath_with_patchelf` is set to `True`.
+            Mutually exclusive with `fix_relative_interpreter_with_patchelf` and `fix_absolute_interpreter_with_patchelf`.
+
+            Note that this will destroy remote-executability and cache-reuse across different systems
+            if the path to the output bases is not exactly the same.
             """,
         default = False,
     ),
