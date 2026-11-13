@@ -155,7 +155,10 @@ def _extract_packages(rctx, lockf):
     data_files = dict()
 
     package_folder = "packages"
-    for (package) in lockf.packages():
+
+    # Queue downloads up front; Bazel limits how many run concurrently.
+    downloads = []
+    for package in lockf.packages():
         if package["arch"] != rctx.attr.architecture:
             continue
 
@@ -165,11 +168,23 @@ def _extract_packages(rctx, lockf):
             package["arch"],
         )
         rctx.report_progress("Downloading package {}".format(package["name"]))
-        rctx.download_and_extract(
+        archive = "{}/{}.deb".format(package_folder, package_key)
+        download = rctx.download(
             package["url"],
             sha256 = package["sha256"],
+            output = archive,
+            block = False,
+        )
+        downloads.append((package, package_key, archive, download))
+
+    for (package, package_key, archive, download) in downloads:
+        download.wait()
+        rctx.report_progress("Extracting package {}".format(package["name"]))
+        rctx.extract(
+            archive,
             output = "{}/{}".format(package_folder, package_key),
         )
+        rctx.delete(archive)
 
         path = _find_data_file(rctx, package_folder, package_key)
         if not path.endswith(".tar"):
@@ -249,4 +264,8 @@ _deb_download = repository_rule(
 deb_download = struct(
     index = _deb_index,
     download = _deb_download,
+)
+
+DO_NOT_DEPEND_ON_THIS_TEST_ONLY = struct(
+    extract_packages = _extract_packages,
 )
