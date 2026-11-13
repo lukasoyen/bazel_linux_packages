@@ -39,7 +39,37 @@ See [e2e/](e2e/README.md) for end to end tests and the extension docs on BCR for
      [`patchelf`](https://github.com/NixOS/patchelf) to modify the executables and
      binaries to add library search directories to `RUNPATH`. See also
      `fix_absolute_interpreter_with_patchelf`,
-     `fix_relative_interpreter_with_patchelf`, and `extra_patchelf_dirs`.
+     `fix_relative_interpreter_with_patchelf`,
+     `fix_shared_interpreter_with_patchelf`, and `extra_patchelf_dirs`.
+
+     With `fix_shared_interpreter_with_patchelf`, your own binaries can use the
+     same interpreter, while Bazel's `$ORIGIN` RPATHs find the libraries:
+
+     ```py
+     load("@my_repository//:defs.bzl", "INTERPRETER")
+     load("@rules_cc//cc:cc_import.bzl", "cc_import")
+     load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+     LIBS = ["libc.so.6", "libm.so.6", "libgcc_s.so.1"]
+
+     [
+         cc_import(
+             name = lib,
+             shared_library = "@my_repository//:usr/lib/x86_64-linux-gnu/" + lib,
+         )
+         for lib in LIBS
+     ]
+
+     cc_library(
+         name = "runtime",
+         linkopts = ["-Wl,--dynamic-linker=" + INTERPRETER, "-Wl,-z,nodefaultlib"],
+         deps = LIBS,
+     )
+     ```
+
+     Link it into every binary with
+     `--@bazel_tools//tools/cpp:link_extra_libs=//:runtime`.
+
   2. The systems' loader will be used to load required libraries and will search
      system-wide. `LD_LIBRARY_PATH` can be used to set directories to search.
      `LD_DEBUG` can be used to debug missing library issues. The generated

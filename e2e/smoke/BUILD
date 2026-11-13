@@ -1,6 +1,7 @@
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@busybox_shared_amd64//:defs.bzl", SHARED_INTERPRETER = "INTERPRETER")
 
 native_binary(
     name = "busybox",
@@ -72,4 +73,32 @@ diff_test(
     name = "manifest_resolute_arm64",
     file1 = "@busybox_resolute_arm64//:manifest",
     file2 = "expected_manifest_resolute_arm64.json",
+)
+
+native_binary(
+    name = "busybox_shared",
+    src = "@busybox_shared_amd64//:bin/busybox",
+)
+
+# BusyBox must use the shared interpreter outside the output base.
+genrule(
+    name = "echo_shared",
+    outs = ["out_shared.txt"],
+    cmd = " && ".join(
+        [
+            # buildifier: disable=external-path
+            'case "{0}" in */external/*|"") exit 1;; esac'.format(SHARED_INTERPRETER),
+            './$(location busybox_shared) strings $(location busybox_shared) | ./$(location busybox_shared) grep -qxF "{0}"'.format(SHARED_INTERPRETER),
+            './$(location busybox_shared) echo "Hello Bazel" > "$@"',
+        ],
+    ),
+    # Only amd64 packages have their interpreter in `lib64/`.
+    target_compatible_with = ["@platforms//cpu:x86_64"],
+    tools = ["busybox_shared"],
+)
+
+diff_test(
+    name = "echo_shared_output",
+    file1 = ":out_shared.txt",
+    file2 = "expected_output.txt",
 )

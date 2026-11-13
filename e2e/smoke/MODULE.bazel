@@ -69,3 +69,21 @@ apt.download(
     ],
 )
 use_repo(apt, "busybox_mixed_amd64", "busybox_mixed_arm64")
+
+apt.download(
+    name = "busybox_shared",
+    architectures = [
+        "amd64",
+        "arm64",
+    ],
+    extra_patchelf_dirs = ["bin"],
+    fix_rpath_with_patchelf = True,
+    fix_shared_interpreter_with_patchelf = True,
+    lockfile = "//:mixed.lock.json",
+    packages = ["busybox"],
+    sources = [
+        "ubuntu_focal",
+        "debian_bookworm",
+    ],
+)
+use_repo(apt, "busybox_shared_amd64")
