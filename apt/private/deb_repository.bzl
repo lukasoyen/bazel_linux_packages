@@ -39,6 +39,10 @@ def _fetch_package_index(rctx, url, dist, comp, arch, integrity, check_for_failu
                 updated_integrity[dist_url] = download.integrity
                 break
 
+        # Failed downloads can leave partial files. Do not include those in a
+        # reproducible repository when a later archive format succeeds.
+        rctx.delete(output)
+        rctx.delete("{}/Packages".format(target_triple))
         failed_attempts.append((dist_url, download, decompress_r))
 
     if check_for_failure and len(failed_attempts) == len(supported_extensions):
@@ -232,6 +236,10 @@ def _fetch_impl(rctx):
         "BUILD.bazel",
         executable = False,
     )
+
+    if hasattr(rctx, "repo_metadata"):
+        return rctx.repo_metadata(reproducible = True)
+    return None
 
 FETCH_ATTR = {
     "suites": attr.string_list(mandatory = True),

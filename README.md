@@ -59,6 +59,18 @@ See [e2e/](e2e/README.md) for end to end tests and the extension docs on BCR for
   a newer Linux kernel than you are running and error out. Use
   `file path/to/your/binary` to check which kernel version is the minimum required.
 
+## Repository contents caching
+
+On Bazel versions that support `repository_ctx.repo_metadata`, pinned package
+indexes, lockfile generation, checksummed package downloads, and plain installed
+repositories opt into the repository contents cache. This also makes them eligible
+for the experimental remote repository contents cache when it is enabled.
+
+Installations using `fix_rpath_with_patchelf`, `add_files`, or `post_install_cmd`
+remain uncached because these options can depend on the host architecture, embed
+absolute repository paths, or execute arbitrary commands. Discovering new package
+index integrity hashes also remains uncached.
+
 ## Key Differences to `rules_distroless`
 
 This project was forked from
